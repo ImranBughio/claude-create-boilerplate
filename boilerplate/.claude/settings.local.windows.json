@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm i *)",
+      "Bash(npm ls *)",
+      "Bash(npm outdated)",
+      "Bash(npm audit)",
+      "Bash(npx next *)",
+      "Bash(npx serve out)"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -c \"[System.Media.SystemSounds]::Exclamation.Play()\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -c \"[System.Media.SystemSounds]::Asterisk.Play()\""
+          }
+        ]
+      }
+    ]
+  }
+}

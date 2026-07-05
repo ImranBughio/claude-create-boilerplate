@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Contract & The Playbook — Designers as Devs</title>
+<meta name="description" content="An interactive read of CLAUDE.md (always-on project context) and the designer playbook, for static-export sites deployed to a PHP server." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #0e0e0e;
+    --accent: #e8591b;
+    --accent-hover: #d35c1a;
+    --n200: #e5e5e5;
+    --n300: #d4d4d4;
+    --n400: #a3a3a3;
+    --n500: #737373;
+    --n600: #525252;
+    --n700: #404040;
+    --sans: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
+  }
+  a { color: inherit; text-decoration: none; }
+  code, .mono { font-family: var(--mono); font-size: 0.92em; }
+
+  /* ── Layout primitives ───────────────────────────── */
+  .band { padding: 5.5rem 1.5rem; }
+  .band.dark { background: var(--ink); color: #fff; }
+  .band.tight { padding: 3.5rem 1.5rem; }
+  .wrap { max-width: 64rem; margin: 0 auto; }
+  .wrap-wide { max-width: 76rem; margin: 0 auto; }
+
+  /* ── Typography ──────────────────────────────────── */
+  .display-caps {
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+    margin: 0;
+  }
+  .label-caps {
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    font-size: 0.69rem;
+    margin: 0;
+  }
+  .accent { color: var(--accent); }
+  .muted { color: var(--n500); }
+  .muted-d { color: var(--n400); }
+  h2.sec { font-size: 1.7rem; }
+  @media (min-width: 640px){ h2.sec { font-size: 2rem; } }
+
+  /* ── Wordmark ────────────────────────────────────── */
+  .mark { display: inline-flex; align-items: center; gap: 0.55rem; font-weight: 800; letter-spacing: -0.01em; font-size: 1.05rem; }
+  .mark .dot { width: 0.62rem; height: 0.62rem; background: var(--accent); display: inline-block; border-radius: 1px; }
+  .mark.sm { font-size: 0.95rem; opacity: 0.7; }
+
+  /* ── Hero file cards ─────────────────────────────── */
+  .filecards { display: grid; gap: 1px; background: rgba(255,255,255,.1); margin-top: 3.5rem; }
+  @media (min-width: 760px){ .filecards { grid-template-columns: 1fr 1fr; } }
+  .filecard { background: var(--ink); padding: 2.2rem; display: flex; flex-direction: column; transition: background .18s; cursor: pointer; }
+  .filecard:hover { background: #161616; }
+  .filecard .fname { font-family: var(--mono); color: var(--accent); font-size: 0.95rem; font-weight: 500; }
+  .filecard .ftag { font-family: var(--mono); color: var(--n500); font-size: 0.7rem; }
+  .filecard h3 { margin: 1rem 0 0; font-size: 1.25rem; letter-spacing: -0.01em; }
+  .filecard p { color: var(--n400); font-size: 0.9rem; margin: 0.75rem 0 0; flex: 1; }
+  .filecard .meta { display: flex; gap: 1.4rem; margin-top: 1.6rem; border-top: 1px solid rgba(255,255,255,.1); padding-top: 1.1rem; }
+  .filecard .meta span { font-size: 0.7rem; color: var(--n500); }
+  .filecard .meta b { display: block; font-size: 1.35rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+  .filecard .go { margin-top: 1.4rem; font-size: 0.69rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); }
+
+  /* ── Awareness board ─────────────────────────────── */
+  .grid-lines { display: grid; gap: 1px; background: var(--n200); margin-top: 3rem; }
+  .cols-3 { grid-template-columns: 1fr; }
+  @media (min-width: 640px){ .cols-3 { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 920px){ .cols-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+  .aw {
+    background: #fff; padding: 1.5rem; cursor: pointer; border: none; text-align: left;
+    font-family: var(--sans); color: var(--ink); transition: background .15s;
+    display: flex; flex-direction: column;
+  }
+  .aw:hover { background: #fafafa; }
+  .aw .tag {
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 500; color: var(--accent);
+    background: rgba(232,89,27,.08); align-self: flex-start; padding: 0.25rem 0.55rem; border-radius: 3px;
+  }
+  .aw .kind { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n400); margin-top: 1rem; }
+  .aw .ctx { font-size: 0.86rem; color: var(--n600); margin: 0; max-height: 0; overflow: hidden; transition: max-height .3s ease, margin .3s ease; }
+  .aw.open .ctx { max-height: 280px; margin-top: 0.55rem; }
+  .aw .chev { margin-top: 0.9rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n400); }
+  .aw.open .chev .t-open { display: inline; } .aw .chev .t-open { display: none; }
+  .aw.open .chev .t-shut { display: none; } .aw .chev .t-shut { display: inline; }
+
+  /* ── File browser ────────────────────────────────── */
+  .tabs { display: flex; flex-wrap: wrap; gap: 1px; margin-top: 2.4rem; background: var(--n200); border: 1px solid var(--n200); width: fit-content; }
+  .tab {
+    font-family: var(--mono); font-size: 0.85rem; padding: 0.7rem 1.3rem; background: #fff; color: var(--n500);
+    cursor: pointer; border: none; transition: color .15s, background .15s;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { background: var(--ink); color: #fff; }
+
+  .browser { display: grid; gap: 2.5rem; margin-top: 2.5rem; }
+  @media (min-width: 900px){ .browser { grid-template-columns: 230px 1fr; gap: 3.5rem; } }
+
+  .toc { align-self: start; }
+  @media (min-width: 900px){ .toc { position: sticky; top: 1.5rem; } }
+  .toc p.label-caps { color: var(--n400); margin-bottom: 0.7rem; }
+  .toc a {
+    display: block; font-size: 0.83rem; color: var(--n500); padding: 0.32rem 0; border-left: 2px solid transparent;
+    padding-left: 0.8rem; transition: color .15s, border-color .15s;
+  }
+  .toc a:hover { color: var(--ink); }
+  .toc a.active { color: var(--ink); border-color: var(--accent); font-weight: 500; }
+
+  .doc-controls { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+  .mini { font-size: 0.69rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n500); cursor: pointer; background: none; border: none; font-family: var(--sans); }
+  .mini:hover { color: var(--accent); }
+
+  .sec-block { border-top: 1px solid var(--n200); }
+  .sec-head {
+    width: 100%; background: none; border: none; cursor: pointer; font-family: var(--sans); color: var(--ink);
+    display: flex; align-items: baseline; gap: 1rem; padding: 1.3rem 0; text-align: left;
+  }
+  .sec-head .n { font-family: var(--mono); font-size: 0.78rem; color: var(--n300); width: 1.8rem; flex-shrink: 0; }
+  .sec-head .ttl { font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; flex: 1; }
+  .sec-head .sub { color: var(--n500); font-weight: 400; font-size: 0.82rem; }
+  .sec-head .pm { color: var(--accent); font-size: 1.1rem; flex-shrink: 0; line-height: 1; }
+  .sec-body { display: none; padding: 0 0 1.8rem 2.8rem; }
+  .sec-block.open .sec-body { display: block; }
+  .sec-block.open .sec-head .pm::after { content: "–"; }
+  .sec-head .pm::after { content: "+"; }
+
+  .sec-body p { font-size: 0.92rem; color: var(--n600); margin: 0 0 0.9rem; }
+  .sec-body ul { margin: 0 0 1rem; padding-left: 1.1rem; }
+  .sec-body li { font-size: 0.9rem; color: var(--n600); margin-bottom: 0.5rem; }
+  .sec-body strong { color: var(--ink); }
+  .sec-body code { background: var(--n200); padding: 0.08rem 0.35rem; border-radius: 3px; color: var(--n700); }
+  .sec-body h4 { margin: 1.4rem 0 0.6rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n400); }
+  .sec-body .muted { color: var(--n400); }
+
+  /* tables inside doc */
+  .dtable { width: 100%; border-collapse: collapse; margin: 0.4rem 0 1rem; }
+  .dtable td { border-bottom: 1px solid var(--n200); padding: 0.6rem 0.6rem 0.6rem 0; font-size: 0.86rem; color: var(--n600); vertical-align: top; }
+  .dtable td:first-child { font-weight: 600; color: var(--ink); white-space: nowrap; padding-right: 1.2rem; }
+
+  /* callout */
+  .callout { border-left: 2px solid var(--accent); background: #fbf6f2; padding: 0.9rem 1.1rem; margin: 0.4rem 0 1.1rem; }
+  .callout.warn { background: #fdf6ec; border-color: #d8a23a; }
+  .callout.danger { background: #fcf0ee; border-color: #d8483a; }
+  .callout p { margin: 0; font-size: 0.86rem; color: var(--n700); }
+  .callout .label-caps { color: var(--accent); margin-bottom: 0.35rem; }
+  .callout.warn .label-caps { color: #b9812a; }
+  .callout.danger .label-caps { color: #c0392b; }
+
+  /* steps */
+  .step { display: flex; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--n200); }
+  .step .si { font-family: var(--mono); color: var(--accent); font-size: 0.8rem; width: 1.5rem; flex-shrink: 0; }
+  .step div { font-size: 0.88rem; color: var(--n600); }
+  .step b { color: var(--ink); }
+
+  /* prompt cards w/ copy */
+  .prompt { border: 1px solid var(--n200); margin: 0.4rem 0 1rem; }
+  .prompt .ph { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--n200); background: #fafafa; }
+  .prompt .ph .pt { font-size: 0.69rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--n500); font-weight: 600; }
+  .prompt .copy { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); cursor: pointer; background: none; border: none; font-family: var(--sans); }
+  .prompt .copy:hover { color: var(--accent-hover); }
+  .prompt pre { margin: 0; padding: 0.9rem; font-family: var(--mono); font-size: 0.8rem; color: var(--n700); white-space: pre-wrap; line-height: 1.5; }
+
+  /* chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.3rem 0 1rem; }
+  .chip { font-family: var(--mono); font-size: 0.76rem; color: var(--n600); background: var(--n200); padding: 0.3rem 0.6rem; border-radius: 3px; }
+
+  /* glossary */
+  .gloss { border-top: 1px solid var(--ink); margin-top: 0.4rem; }
+  .gloss div { display: grid; grid-template-columns: 1fr; gap: 0.1rem; border-bottom: 1px solid var(--n200); padding: 0.7rem 0; }
+  @media (min-width: 560px){ .gloss div { grid-template-columns: 150px 1fr; gap: 1.2rem; } }
+  .gloss dt { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+  .gloss dd { margin: 0; font-size: 0.84rem; color: var(--n600); }
+
+  .hidden { display: none !important; }
+
+  /* ── Download the boilerplate ─────────────────────── */
+  .dl-grid { display: grid; gap: 1px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.12); margin-top: 2.4rem; }
+  @media (min-width: 640px){ .dl-grid { grid-template-columns: 1fr 1fr; } }
+  .dl-card { background: var(--ink); padding: 1.8rem; display: flex; flex-direction: column; gap: 0.6rem; }
+  .dl-card .os { font-size: 0.69rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n400); }
+  .dl-card h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+  .dl-card p { margin: 0 0 0.4rem; font-size: 0.82rem; color: var(--n400); line-height: 1.5; }
+  .dl-btn {
+    align-self: flex-start; margin-top: auto; cursor: pointer; font-family: var(--sans);
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+    color: #fff; background: var(--accent); border: none; padding: 0.7rem 1.2rem; border-radius: 3px;
+    transition: background .15s;
+  }
+  .dl-btn:hover { background: var(--accent-hover); }
+  .dl-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .dl-note { margin-top: 1.4rem; font-size: 0.78rem; color: var(--n400); max-width: 40rem; }
+  .dl-note code { background: rgba(255,255,255,.1); padding: 0.08rem 0.35rem; border-radius: 3px; color: #fff; }
+
+  footer.band { border-top: 1px solid rgba(255,255,255,.1); }
+  .foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem; }
+
+  /* toast */
+  #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(2rem); background: var(--ink); color: #fff; padding: 0.7rem 1.3rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 50; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ── Hero ─────────────────────────────────────────── -->
+<section class="band dark">
+  <div class="wrap">
+    <div class="mark"><span class="dot"></span>Create</div>
+    <p class="label-caps accent" style="margin-top:3rem;">How the system is wired</p>
+    <h1 class="display-caps" style="font-size:clamp(2.4rem,7vw,4rem); margin-top:1rem;">
+      One contract<br />the agent obeys.<br /><span class="accent">One playbook</span> for you.
+    </h1>
+    <p class="muted-d" style="max-width:37rem; margin-top:1.8rem; font-size:1.05rem;">
+      Designers ship real sites with Claude Code. <span class="mono accent">CLAUDE.md</span>
+      carries always-on project context for agents: stable constraints, required checkpoints,
+      and long-lived decisions to follow across sessions.
+      Sites still ship as a <strong class="accent">static export</strong> to a
+      <strong class="accent">PHP server</strong>.
+    </p>
+
+    <div class="filecards">
+      <div class="filecard" data-open="claude">
+        <span class="fname">CLAUDE.md <span class="ftag">· agent contract</span></span>
+        <h3>Loaded into every session</h3>
+        <p>Minimal and reusable — only core context, non-negotiables, and checkpoint triggers. Detailed guidance is pushed into skills.</p>
+        <div class="meta">
+          <span><b>4</b>core sections</span>
+          <span><b>2</b>required checkpoints</span>
+          <span><b>1</b>primary quality skill</span>
+        </div>
+        <span class="go">Read the contract →</span>
+      </div>
+      <div class="filecard" data-open="play">
+        <span class="fname">The playbook <span class="ftag">· for designers</span></span>
+        <h3>The human reference</h3>
+        <p>The teaching the agent doesn't carry: the daily workflow, the quality checkpoints, the bridge skill, the prompt library, the API directory, glossary. Read it like a guide.</p>
+        <div class="meta">
+          <span><b>22</b>sections</span>
+          <span><b>9+</b>prompts</span>
+          <span><b>30+</b>APIs</span>
+        </div>
+        <span class="go">Open the playbook →</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Awareness board ──────────────────────────────── -->
+<section class="band" id="awareness">
+  <div class="wrap-wide">
+    <p class="label-caps accent">What CLAUDE.md makes the agent aware of</p>
+    <h2 class="display-caps sec" style="margin-top:1rem;">The project context<br />the file loads as always-on guidance.</h2>
+    <p class="muted" style="max-width:37rem; margin-top:1.4rem; font-size:0.95rem;">
+      These are the key guardrails the always-on contract puts in front of Claude every session:
+      static export reality, public-bundle security, start-of-project validation, and when to
+      run the quality skill. Tap any card for context.
+    </p>
+
+    <div class="grid-lines cols-3" id="awGrid"><!-- injected by JS --></div>
+  </div>
+</section>
+
+<!-- ── File browser ─────────────────────────────────── -->
+<section class="band" style="background:#fff;">
+  <div class="wrap-wide">
+    <p class="label-caps accent">Up close</p>
+    <h2 class="display-caps sec" style="margin-top:1rem;">The contract and the<br />playbook, in full.</h2>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="claude"><span class="accent">●</span>&nbsp; CLAUDE.md</button>
+      <button class="tab" data-tab="play"><span class="accent">●</span>&nbsp; The playbook</button>
+    </div>
+
+    <!-- CLAUDE.md view -->
+    <div class="browser" id="view-claude">
+      <nav class="toc">
+        <p class="label-caps">The contract</p>
+        <div class="toc-links"></div>
+      </nav>
+      <div class="doc">
+        <div class="doc-controls">
+          <p class="muted" style="font-size:0.82rem; margin:0;">Always-on project context — what Claude follows, top to bottom.</p>
+          <button class="mini" data-toggleall="claude">Collapse all</button>
+        </div>
+        <div class="sections"></div>
+      </div>
+    </div>
+
+    <!-- Playbook view -->
+    <div class="browser hidden" id="view-play">
+      <nav class="toc">
+        <p class="label-caps">The playbook</p>
+        <div class="toc-links"></div>
+      </nav>
+      <div class="doc">
+        <div class="doc-controls">
+          <p class="muted" style="font-size:0.82rem; margin:0;">The designer reference — read it like a guide; the agent doesn't carry this.</p>
+          <button class="mini" data-toggleall="play">Collapse all</button>
+        </div>
+        <div class="sections"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Download the boilerplate ─────────────────────── -->
+<section class="band dark" id="download">
+  <div class="wrap">
+    <p class="label-caps accent">Start here</p>
+    <h2 class="display-caps sec" style="margin-top:1rem;">Download the boilerplate.</h2>
+    <p class="muted-d" style="max-width:40rem; margin-top:1.4rem; font-size:0.95rem;">
+      A ready-to-drop folder: the <span class="mono accent">CLAUDE.md</span> contract, the
+      <span class="mono accent">quality-checkpoint</span> skill, and a starter
+      <span class="mono accent">.claude/settings.local.json</span> wired with desktop
+      notifications for when Claude needs you or finishes a task. Pick your operating system —
+      the only difference is how those notifications fire.
+    </p>
+
+    <div class="dl-grid">
+      <div class="dl-card">
+        <span class="os">macOS</span>
+        <h3>For Mac</h3>
+        <p>Notifications use the built-in <code>osascript</code> with system sounds (Glass / Ping).</p>
+        <button class="dl-btn" data-os="mac">Download for macOS</button>
+      </div>
+      <div class="dl-card">
+        <span class="os">Windows</span>
+        <h3>For Windows</h3>
+        <p>Notifications play system sounds via <code>powershell</code> (Exclamation / Asterisk).</p>
+        <button class="dl-btn" data-os="windows">Download for Windows</button>
+      </div>
+    </div>
+
+    <p class="dl-note">
+      Unzip it, then copy <code>CLAUDE.md</code> and the <code>.claude</code> folder into the root
+      of your project. That's it — open the project in Claude Code and the contract, skill, and
+      notifications are live.
+    </p>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────── -->
+<footer class="band tight dark">
+  <div class="wrap foot">
+    <div class="mark sm"><span class="dot"></span>Create</div>
+    <p class="label-caps muted">Built for designers, by the platform team</p>
+  </div>
+</footer>
+
+<div id="toast">Copied to clipboard</div>
+
+<script>
+/* ───────────────────────────────────────────────────────────
+   DATA — the agent-awareness board (drawn from CLAUDE.md)
+   ─────────────────────────────────────────────────────────── */
+const AWARE = [
+  { tag: "always-on context", kind: "Context strategy", ctx: "CLAUDE.md provides stable project constraints, required checkpoints, and long-lived decisions that agents should follow across sessions." },
+  { tag: "designers-first", kind: "Audience", ctx: "The default user context is designers with little/no development background, so instructions should be clear, practical, and low-friction." },
+  { tag: "static export → PHP host", kind: "Deployment reality", ctx: "Next.js is allowed, but production is static files uploaded to PHP/Apache hosting. The shipped artifact is out/." },
+  { tag: "re-validate decisions at start", kind: "Project start check", ctx: "Framework, UI library, and key packages must be checked for current relevance before building new work." },
+  { tag: "no runtime Node reliance", kind: "Runtime constraint", ctx: "Production cannot depend on Node server features. The deployed site must work as a static export." },
+  { tag: "frontend is public", kind: "Security baseline", ctx: "Everything in the bundle is readable by visitors. No secrets should be shipped in client code." },
+  { tag: "quality-checkpoint", kind: "Required skill", ctx: "Run at milestone and pre-deployment. Before checklist-driven code edits, recommend a quick checkpoint commit. Then cover performance, dependency currency, accessibility/SEO/GEO, security, architecture, quality, and responsive behavior." },
+  { tag: "branch + PR flow", kind: "Workflow default", ctx: "Use branch and PR workflow as the team default and avoid direct commits to protected main branches." },
+];
+
+/* ───────────────────────────────────────────────────────────
+   DATA — CLAUDE.md, always-on project context
+   ─────────────────────────────────────────────────────────── */
+const CONTRACT = [
+  { id:"core", title:"Core context", sub:"Minimal shared setup", html:`
+    <ul>
+      <li>Primary users are designers with little/no dev background.</li>
+      <li>Deployment target is PHP/Apache hosting using static files.</li>
+      <li>Next.js is allowed, but deployed output must be a static export (<code>out/</code>).</li>
+    </ul>
+    <div class="callout"><p class="label-caps">Intent</p><p>Always-on context for designer-led delivery: stable constraints, required checkpoints, and long-lived decisions for agents to follow.</p></div>`},
+  { id:"nonneg", title:"Non-negotiables", sub:"Always enforced", html:`
+    <ul>
+      <li>Re-validate framework, UI library, and key packages at project start. Prefer maintained, current, industry-standard options.</li>
+      <li>Configure for static export compatibility and avoid runtime Node dependencies in production.</li>
+      <li>Treat the frontend bundle as public. Never ship secrets in client code.</li>
+      <li>Before deployment, ensure the build output is upload-ready for the PHP host.</li>
+    </ul>`},
+  { id:"checkpoints", title:"Required quality checkpoints", sub:"Run the quality-checkpoint skill", html:`
+    <p>Run <code>quality-checkpoint</code> at two moments:</p>
+    <ul>
+      <li><strong>Milestone checkpoint</strong> — during development when a meaningful milestone is reached.</li>
+      <li><strong>Pre-deployment checkpoint</strong> — before shipping/upload.</li>
+    </ul>
+    <h4>Checkpoint commit practice</h4>
+    <ul>
+      <li>Before checklist-driven code changes begin, recommend a quick checkpoint commit.</li>
+      <li>If approved, create that commit first so resulting fixes are easier to review and roll back.</li>
+    </ul>
+    <h4>Coverage areas</h4>
+    <div class="chips">
+      <span class="chip">Performance</span>
+      <span class="chip">Dependency currency</span>
+      <span class="chip">Accessibility</span>
+      <span class="chip">SEO &amp; GEO</span>
+      <span class="chip">Security</span>
+      <span class="chip">Reusable architecture</span>
+      <span class="chip">Code quality</span>
+      <span class="chip">Mobile &amp; tablet</span>
+    </div>`},
+  { id:"workflow", title:"Team workflow defaults", sub:"Simple baseline", html:`
+    <ul>
+      <li>Use branch + PR workflow; avoid direct commits to protected main branches.</li>
+    </ul>`},
+];
+
+/* ───────────────────────────────────────────────────────────
+   DATA — the playbook (designer-facing teaching; not agent context)
+   ─────────────────────────────────────────────────────────── */
+const PLAYBOOK = [
+  { id:"deal", title:"The deal", sub:"Decided vs owned", html:`
+    <p>A designer with a Claude Code subscription ships real sites. Every infrastructure decision is <strong>already made</strong>: the stack, where things deploy (static export → PHP server), how code is reviewed, and what the quality bar is.</p>
+    <h4>Owned by the designer</h4>
+    <ul><li>The interface — layout, motion, typography, craft; the design system; responsive behavior; prompting Claude; shipping something worth being proud of.</li></ul>
+    <div class="callout"><p class="label-caps">Mental model</p><p>The infrastructure is a print shop. You don't need to know how the press works to deliver beautiful work — but you do need the file format, the bleed margins, and who to call when the proofs look wrong.</p></div>`},
+  { id:"deploy-reality", title:"Where this ships", sub:"Static export → PHP server", html:`
+    <p>The team's hosting is a <strong>PHP / Apache server</strong>, so sites ship as a <strong>static export</strong> — Next.js builds to a folder of plain HTML/CSS/JS (<code>out/</code>) that gets uploaded. There's no Node running in production.</p>
+    <p>What that means for you, day to day:</p>
+    <ul>
+      <li><strong>Two kinds of project.</strong> Most are <em>static</em> — content baked in when the site is built. Some are <em>dynamic</em> — the page calls an outside service (an API) from the browser to load live data.</li>
+      <li><strong>Everything you ship is public.</strong> A static site has no backroom — never put a password or secret key in the code.</li>
+      <li><strong>Deploy = build then upload.</strong> No magic "merge and it's live" pipeline (yet); the exact upload step is still being decided.</li>
+    </ul>`},
+  { id:"checkpoints", title:"The two checkpoints", sub:"Milestone + pre-deploy", html:`
+    <p>Quality isn't a final-day scramble — it's two deliberate stops, both run by the <code>quality-checkpoint</code> skill. Ask Claude to "run the quality checkpoint" and it walks the list, fixes the clear-cut issues, and hands you the judgment calls.</p>
+    <p>Before checkpoint-driven code edits begin, ask Claude to create a quick checkpoint commit (after your approval) so changes stay easy to audit and revert if needed.</p>
+    <h4>When</h4>
+    <ul><li><strong>Milestone</strong> — a meaningful chunk is done; catch problems while they're cheap.</li><li><strong>Pre-deployment</strong> — before anything is uploaded.</li></ul>
+    <h4>What it checks</h4>
+    <div class="chips">
+      <span class="chip">Performance</span><span class="chip">Dependencies up to date</span><span class="chip">Accessibility</span>
+      <span class="chip">SEO &amp; GEO</span><span class="chip">Security</span><span class="chip">Reusable architecture</span>
+      <span class="chip">Code quality</span><span class="chip">Mobile &amp; tablet</span>
+    </div>
+    <div class="prompt"><div class="ph"><span class="pt">Run a checkpoint</span><button class="copy">Copy</button></div><pre>Run the quality checkpoint for this milestone. Go area by area, fix the clear-cut issues, and give me a report of what needs my decision.</pre></div>`},
+  { id:"workflow", title:"Your daily workflow", sub:"From ticket to uploaded", html:`
+    <div>
+      <div class="step"><span class="si">01</span><div><b>Pick up a ticket.</b> Vague? Comment and ask — don't guess.</div></div>
+      <div class="step"><span class="si">02</span><div><b>Start fresh.</b> Update main, branch off it: <code>yourname/short-description</code>.</div></div>
+      <div class="step"><span class="si">03</span><div><b>Build with Claude.</b> Dev server + localhost:3000 open. Small pieces; commit every time something works.</div></div>
+      <div class="step"><span class="si">04</span><div><b>Self-review.</b> Run all checks and the static build; then a designer pass — mobile, tablet, keyboard, compare to Figma.</div></div>
+      <div class="step"><span class="si">05</span><div><b>Open a PR.</b> Ticket number in title; what &amp; why in description; before/after shots.</div></div>
+      <div class="step"><span class="si">06</span><div><b>Review &amp; revise.</b> Automated checks + one human review. Paste any comment you don't get into Claude.</div></div>
+      <div class="step"><span class="si">07</span><div><b>Merge → build → upload.</b> Squash and merge, run the pre-deploy checkpoint, build <code>out/</code>, and it goes to the server.</div></div>
+    </div>`},
+  { id:"git", title:"Git & pull requests", sub:"Six borrowed concepts", html:`
+    <p><strong>Repo</strong> (project file), <strong>commit</strong> (named save point), <strong>branch</strong> (private duplicate), <strong>push</strong> (upload to GitHub), <strong>PR</strong> (critique before ship), <strong>merge</strong> (flatten into main).</p>
+    <ul>
+      <li><strong>Nobody commits to main directly</strong> — everything via PR.</li>
+      <li><strong>One ticket, one branch, one PR</strong> — small PRs get reviewed in minutes.</li>
+      <li><strong>We squash-merge</strong> — messy WIP commits collapse into one clean entry.</li>
+      <li><strong>A merge conflict is routine</strong> — have Claude show both sides and explain before resolving.</li>
+    </ul>`},
+  { id:"data", title:"Data: the two paths", sub:"Static vs dynamic", html:`
+    <p><strong>Static (default).</strong> Content lives in the project (files, or a build-time pull from a CMS) and is baked into the pages when the site builds. Fast, simple, nothing to break at runtime.</p>
+    <p><strong>Dynamic (when you need live data).</strong> The page calls an <strong>external API</strong> from the browser via a typed client in <code>lib/api/</code>. Any fetch needs <strong>three states</strong>: loading (skeletons beat spinners), empty (often the most important screen), error (friendly message + retry).</p>
+    <div class="callout warn"><p class="label-caps">No secrets in the browser</p><p>Anything the page can read, a visitor can read. Privileged keys and sensitive logic stay on the external API, never in the front-end.</p></div>`},
+  { id:"auth", title:"Authentication", sub:"Only on the dynamic path", html:`
+    <p>Static sites have no login. When a project needs accounts, it's on the dynamic path: use the chosen provider's <strong>client SDK</strong> (or tokens against the external API).</p>
+    <div class="callout danger"><p class="label-caps">Client gating isn't security</p><p>Hiding a page in front-end code only hides it visually — a determined visitor can still see the bundle. Real protection lives on the external API. Design the signed-in experience; let the API enforce access.</p></div>`},
+  { id:"security", title:"Security", sub:"The static-site lens", html:`
+    <div>
+      <div class="step"><span class="si">01</span><div><b>The whole bundle is public.</b> No keys, tokens, or passwords in the code — ever. They live on the external API.</div></div>
+      <div class="step"><span class="si">02</span><div><b>Never paste secrets</b> into Slack, Figma, tickets, or screenshots. Use the team password manager.</div></div>
+      <div class="step"><span class="si">03</span><div><b>Never disable the guardrails.</b> Red means fix the issue, not silence the check.</div></div>
+      <div class="step"><span class="si">04</span><div><b>Treat user input as hostile.</b> Build forms the template way (RHF + Zod) — never hand-roll input handling.</div></div>
+      <div class="step"><span class="si">05</span><div><b>Headers live on Apache.</b> With no Node, CSP/HSTS and friends are set in <code>.htaccess</code> — flagged in the security checkpoint.</div></div>
+    </div>`},
+  { id:"quality", title:"Code quality & CI", sub:"Mostly automated", html:`
+    <p><strong>Prettier</strong> (format on save), <strong>ESLint</strong> (real mistakes), <strong>TypeScript</strong> (pieces fit), and <strong>CI on every PR</strong> (lint, types, tests, static build).</p>
+    <p>A red ✕ is information, not judgment — have Claude read the logs, explain, fix, push. Human review is for what robots can't judge: consistency, reusability, edge cases, "is there a simpler way?". <strong>Green checks + one approval = ship.</strong></p>`},
+  { id:"testing", title:"Testing", sub:"Claude writes them", html:`
+    <ul><li><strong>Unit tests (Vitest)</strong> — one piece in isolation; fast, many, every PR.</li><li><strong>End-to-end (Playwright)</strong> — a robot browser clicks real flows; slower, fewer.</li></ul>
+    <p>When a test fails, ask: is the test right and the code wrong, or did I change behavior on purpose? <strong>Never delete a failing test to make CI green.</strong></p>`},
+  { id:"a11y", title:"Accessibility", sub:"We build to WCAG 2.2 AA", html:`
+    <p>Most is handled (shadcn semantics, ESLint, semantic HTML). What remains is judgment. The five-minute pre-PR pass:</p>
+    <ul><li>Keyboard-walk the whole feature; alt text on meaningful images (empty on decorative); visible labels; 4.5:1 contrast; 200% zoom; <code>prefers-reduced-motion</code> respected.</li></ul>
+    <p>Habits: real buttons/links (not clickable <code>div</code>s), never remove focus rings, color is never the only signal, heading order is structure. Full audit runs in the checkpoint.</p>`},
+  { id:"responsive", title:"Responsive & browsers", sub:"Mobile, tablet, Safari", html:`
+    <p>Every screen must work on <strong>mobile and tablet</strong>, not just your desktop. Test at <strong>375px</strong>, <strong>768px</strong>, and wide. No horizontal scroll; touch targets ≥ 44px; fluid layout, not hardcoded pixels.</p>
+    <p><strong>Safari is the new IE</strong> — if something visual breaks in one browser, it's Safari (especially iOS): date inputs, scroll, backdrop blur, viewport height. Check it before every visual PR.</p>`},
+  { id:"compat-email", title:"Email", sub:"A different planet", html:`
+    <p>Email clients render HTML like it's 2009. Build emails as React Email components, preview locally, and send through the <strong>external API or an email service</strong> (a static site can't send mail itself). Ship only after a Litmus check. Design defensively: single column, 600px, system-font fallbacks, dark-mode check.</p>`},
+  { id:"deploy", title:"Deploy & rollback", sub:"Build → out/ → upload", html:`
+    <p>No servers or release windows. Claude runs <code>npm run build</code> to produce the <code>out/</code> folder — plain files — and those get uploaded to the PHP server. The exact upload step (FTP / cPanel / automated) is still being decided by whoever owns hosting.</p>
+    <p><strong>Rollback</strong> = keep the previous <code>out/</code> and re-upload it. So keep your last good build before shipping a new one.</p>`},
+  { id:"break", title:"When things break", sub:"The triage", html:`
+    <div class="callout warn"><p class="label-caps">Universal first move</p><p>Copy the <strong>exact</strong> error text and paste it to Claude with "what does this mean?". Never retype or summarize an error.</p></div>
+    <ul>
+      <li><strong>Local won't load</strong> → dev server not running (10-sec fix), error overlay (paste it), or stale code after a branch switch (reinstall + restart + clear cache).</li>
+      <li><strong>CI is red</strong> → click the ✕. Lint/types: Claude reads logs and fixes. Tests: intentional → update test; surprise → fix code. Build: reproduce locally.</li>
+      <li><strong>Works in dev, broken in the static build</strong> → a server-only feature snuck in, or an asset path is wrong for export. Run <code>npx serve out</code> and check.</li>
+      <li><strong>Merge conflict</strong> → small: resolve side-by-side. Large + old branch: replay onto a fresh branch.</li>
+    </ul>`},
+  { id:"bridge", title:"The bridge skill", sub:"Design-to-code in four phases", html:`
+    <div>
+      <div class="step"><span class="si">01</span><div><b>Interview</b> — asks visual questions first: mobile stacking, hover behavior, the empty state.</div></div>
+      <div class="step"><span class="si">02</span><div><b>Proposal</b> — a short plan: which tokens and components it'll reuse, target contrast, responsive behavior — before edits.</div></div>
+      <div class="step"><span class="si">03</span><div><b>Bounded build</b> — only after you approve, and only inside the folder you pointed at.</div></div>
+      <div class="step"><span class="si">04</span><div><b>Verification report</b> — measured contrast ratios, the semantic HTML used, a mobile/tablet/desktop check.</div></div>
+    </div>`},
+  { id:"habits", title:"Four dev habits", sub:"How engineers steer the agent", html:`
+    <ul>
+      <li><strong>Layered context</strong> — offload rules to CLAUDE.md so you never re-explain.</li>
+      <li><strong>Blast-radius scoping</strong> — fence the agent into one folder. "Only edit <code>components/nav</code>."</li>
+      <li><strong>Verification gating</strong> — "run the build and fix anything red." It self-corrects before handing back.</li>
+      <li><strong>Multi-phase work</strong> — let Claude interview and propose before it touches a file.</li>
+    </ul>`},
+  { id:"moves", title:"Terminal moves", sub:"Prompts worth stealing", html:`
+    <div class="prompt"><div class="ph"><span class="pt">Scope the blast radius</span><button class="copy">Copy</button></div><pre>Add an export button to the analytics panel. Limit edits ONLY to components/analytics/. Ask before touching anything global.</pre></div>
+    <div class="prompt"><div class="ph"><span class="pt">Gate on a real check</span><button class="copy">Copy</button></div><pre>Optimize the gallery grid in components/gallery. When you're done, run the static build and fix anything that fails before handing it back.</pre></div>
+    <div class="prompt"><div class="ph"><span class="pt">Set the guardrails</span><button class="copy">Copy</button></div><pre>Refactor the form validation. DO NOT run git reset or git push. DO NOT read or expose any .env files.</pre></div>
+    <div class="prompt"><div class="ph"><span class="pt">Verify the export</span><button class="copy">Copy</button></div><pre>Build the static site and serve out/ locally. Click through every page and tell me if any route, image, or asset is broken in the export.</pre></div>`},
+  { id:"library", title:"Prompt library", sub:"Curated for recurring jobs", html:`
+    <table class="dtable">
+      <tr><td>Fresh Build</td><td>Start a new project with a verified, current tech-stack selection.</td></tr>
+      <tr><td>Design System</td><td>Stand up tokens, components, and theming from day one.</td></tr>
+      <tr><td>Quality Checkpoint</td><td>Run the milestone / pre-deploy audit (the skill).</td></tr>
+      <tr><td>Security Audit</td><td>Confirm no secrets ship and inputs are validated.</td></tr>
+      <tr><td>SEO &amp; GEO</td><td>Meta tags, sitemap, structured data, AI-engine readability.</td></tr>
+    </table>
+    <div class="prompt"><div class="ph"><span class="pt">The red-check routine</span><button class="copy">Copy</button></div><pre>A CI check failed on my PR. Use the GitHub CLI to read the logs, explain what broke in plain English, then fix it and push.</pre></div>
+    <div class="prompt"><div class="ph"><span class="pt">Verify the stack is current</span><button class="copy">Copy</button></div><pre>Before we start: list our planned framework and packages, check each against its latest docs/releases, and flag anything deprecated or no longer the standard choice.</pre></div>`},
+  { id:"mcp", title:"MCP integrations", sub:"Claude plugged into your canvas", html:`
+    <ul>
+      <li><strong>Figma</strong> — reads frames, components, and assets from the source file. No screenshots, no guessing at spacing.</li>
+      <li><strong>Chrome DevTools</strong> — drives a real browser: clicks your flow, reads console errors, runs Lighthouse, checks its own work.</li>
+    </ul>`},
+  { id:"skills", title:"Skills", sub:"Real, on-demand capabilities", html:`
+    <p>A real Claude Code skill lives at <code>.claude/skills/&lt;name&gt;/SKILL.md</code> with <code>name</code>/<code>description</code> frontmatter — discovered on demand, not carried every turn.</p>
+    <ul>
+      <li><strong>quality-checkpoint</strong> <span class="muted">(built)</span> — the milestone &amp; pre-deploy audit.</li>
+      <li><strong>Tech-stack skill</strong> <span class="muted">(planned)</span> — encodes the approved, verified stack so projects start on rails.</li>
+      <li><strong>Brand-design skill</strong> <span class="muted">(planned)</span> — encodes a brand's design language.</li>
+    </ul>`},
+  { id:"fluency", title:"Claude fluency", sub:"The tool itself", html:`
+    <div class="chips">
+      <span class="chip">Ultra think</span><span class="chip">Model switching</span><span class="chip">Context awareness</span>
+      <span class="chip">Sharing folders</span><span class="chip">Permission controls</span><span class="chip">MCPs on/off</span>
+      <span class="chip">Prompt writing</span><span class="chip">Multiple worktrees</span>
+    </div>
+    <p>The habits that separate a frustrating session from a productive one — when to ask for deeper reasoning, picking the right model, watching context usage, and controlling what Claude may do alone.</p>`},
+  { id:"apis", title:"API directory", sub:"For the dynamic path", html:`
+    <div class="callout"><p class="label-caps">One rule for every key</p><p>It lives on the external API, never in the static bundle. The browser calls your API; your API holds the keys. Sanity-check a new service in #design-dev-help first.</p></div>
+    <table class="dtable">
+      <tr><td>Maps</td><td>Google Maps · Mapbox · OpenWeather</td></tr>
+      <tr><td>Video</td><td>YouTube Data · Vimeo · Mux · Cloudinary</td></tr>
+      <tr><td>Payments</td><td>Stripe · PayPal</td></tr>
+      <tr><td>AI</td><td>Anthropic (Claude) · OpenAI</td></tr>
+      <tr><td>CMS</td><td>Sanity · Contentful · Notion API</td></tr>
+      <tr><td>Storage</td><td>Cloudinary · UploadThing · AWS S3</td></tr>
+      <tr><td>Search</td><td>Algolia</td></tr>
+      <tr><td>Analytics</td><td>Plausible · GA4 · PostHog</td></tr>
+      <tr><td>Forms/Email</td><td>Resend · Formspree · Web3Forms</td></tr>
+    </table>`},
+  { id:"glossary", title:"Glossary", sub:"Translated into designer", html:`
+    <dl class="gloss">
+      <div><dt>Static export</dt><dd>Building the site into plain files (no server) — what we upload to the PHP host.</dd></div>
+      <div><dt>out/</dt><dd>The folder the build produces; the thing that gets uploaded.</dd></div>
+      <div><dt>API</dt><dd>An outside service the page can ask for data — used on the dynamic path.</dd></div>
+      <div><dt>Branch</dt><dd>Your private duplicate of the project.</dd></div>
+      <div><dt>CI / CD</dt><dd>Robots that check every change automatically.</dd></div>
+      <div><dt>Commit</dt><dd>A named save point.</dd></div>
+      <div><dt>Component</dt><dd>A reusable piece of UI; props are the variant controls.</dd></div>
+      <div><dt>GEO</dt><dd>Generative-engine optimization — making the site easy for AI engines to read and cite.</dd></div>
+      <div><dt>Main</dt><dd>The master branch; its build is what's on the live site.</dd></div>
+      <div><dt>Merge conflict</dt><dd>Two people edited the same lines; routine.</dd></div>
+      <div><dt>PR</dt><dd>"Here's my work, please critique before it ships."</dd></div>
+      <div><dt>Rollback</dt><dd>Re-uploading the previous build to undo a bad deploy.</dd></div>
+      <div><dt>Squash merge</dt><dd>Many messy commits become one clean entry.</dd></div>
+    </dl>`},
+];
+
+/* ───────────────────────────────────────────────────────────
+   RENDER
+   ─────────────────────────────────────────────────────────── */
+function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+
+// Awareness board
+const awGrid = document.getElementById('awGrid');
+AWARE.forEach(a=>{
+  const card = el(`<button class="aw">
+    <span class="tag">${a.tag}</span>
+    <span class="kind">${a.kind}</span>
+    <p class="ctx">${a.ctx}</p>
+    <span class="chev"><span class="t-shut">Context</span><span class="t-open">Hide</span> +</span>
+  </button>`);
+  card.addEventListener('click',()=>card.classList.toggle('open'));
+  awGrid.appendChild(card);
+});
+
+// File sections + TOC
+function renderFile(view, data){
+  const root = document.getElementById('view-'+view);
+  const tocWrap = root.querySelector('.toc-links');
+  const secWrap = root.querySelector('.sections');
+  data.forEach((s,i)=>{
+    const block = el(`<div class="sec-block ${i===0?'open':''}" id="${view}-${s.id}">
+      <button class="sec-head">
+        <span class="n">${String(i+1).padStart(2,'0')}</span>
+        <span class="ttl">${s.title} <span class="sub">— ${s.sub}</span></span>
+        <span class="pm"></span>
+      </button>
+      <div class="sec-body">${s.html}</div>
+    </div>`);
+    block.querySelector('.sec-head').addEventListener('click',()=>block.classList.toggle('open'));
+    secWrap.appendChild(block);
+
+    const link = el(`<a href="#${view}-${s.id}" data-target="${view}-${s.id}">${s.title}</a>`);
+    link.addEventListener('click',()=>block.classList.add('open'));
+    tocWrap.appendChild(link);
+  });
+}
+renderFile('claude', CONTRACT);
+renderFile('play', PLAYBOOK);
+
+// Copy buttons
+document.querySelectorAll('.prompt').forEach(p=>{
+  const btn = p.querySelector('.copy');
+  btn.addEventListener('click',()=>{
+    const text = p.querySelector('pre').textContent;
+    navigator.clipboard?.writeText(text).then(showToast).catch(()=>{});
+    btn.textContent='Copied'; setTimeout(()=>btn.textContent='Copy',1400);
+  });
+});
+function showToast(){ const t=document.getElementById('toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1300); }
+
+// Tab + hero-card switching
+function switchTab(view){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===view));
+  document.getElementById('view-claude').classList.toggle('hidden', view!=='claude');
+  document.getElementById('view-play').classList.toggle('hidden', view!=='play');
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+document.querySelectorAll('.filecard').forEach(c=>c.addEventListener('click',()=>{
+  switchTab(c.dataset.open);
+  document.querySelector('.tabs').scrollIntoView({behavior:'smooth', block:'start'});
+}));
+
+// Collapse / expand all
+document.querySelectorAll('[data-toggleall]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const view=btn.dataset.toggleall;
+    const blocks=document.querySelectorAll('#view-'+view+' .sec-block');
+    const anyOpen=[...blocks].some(b=>b.classList.contains('open'));
+    blocks.forEach(b=>b.classList.toggle('open', !anyOpen));
+    btn.textContent = anyOpen ? 'Expand all' : 'Collapse all';
+  });
+});
+
+// Scroll-spy for TOC
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const id=e.target.id;
+      document.querySelectorAll('.toc-links a').forEach(a=>a.classList.toggle('active', a.dataset.target===id));
+    }
+  });
+},{ rootMargin:'-20% 0px -70% 0px', threshold:0 });
+document.querySelectorAll('.sec-block').forEach(b=>spy.observe(b));
+
+/* ───────────────────────────────────────────────────────────
+   DOWNLOAD THE BOILERPLATE
+   Builds a .zip entirely in the browser (no library, works offline
+   and from file://) so the page stays a single self-contained file.
+
+   The two markdown files are embedded as base64 copies of the repo's
+   boilerplate/. To refresh after editing those files, regenerate with:
+     base64 -i boilerplate/CLAUDE.md | tr -d '\n'
+     base64 -i boilerplate/.claude/skills/quality-checkpoint/SKILL.md | tr -d '\n'
+   settings.local.json is assembled below from the same permissions +
+   per-OS hooks kept in boilerplate/.claude/.
+   ─────────────────────────────────────────────────────────── */
+const CLAUDE_MD_B64 = "IyBDTEFVREUubWQKCkFsd2F5cy1vbiBwcm9qZWN0IGNvbnRleHQgZm9yIGRlc2lnbmVyLWxlZCBkZWxpdmVyeS4KVXNlIHRoaXMgZmlsZSBmb3Igc3RhYmxlIHByb2plY3QgY29uc3RyYWludHMsIHJlcXVpcmVkIGNoZWNrcG9pbnRzLCBhbmQgbG9uZy1saXZlZCBkZWNpc2lvbnMKdGhhdCBhZ2VudHMgc2hvdWxkIGZvbGxvdyBhY3Jvc3Mgc2Vzc2lvbnMuCgojIyBDb3JlIGNvbnRleHQKCi0gUHJpbWFyeSB1c2VycyBhcmUgZGVzaWduZXJzIHdpdGggbGl0dGxlL25vIGRldiBiYWNrZ3JvdW5kLgotIERlcGxveW1lbnQgdGFyZ2V0IGlzIFBIUC9BcGFjaGUgaG9zdGluZyB1c2luZyBzdGF0aWMgZmlsZXMuCi0gTmV4dC5qcyBpcyBhbGxvd2VkLCBidXQgdGhlIGRlcGxveWVkIG91dHB1dCBtdXN0IGJlIHN0YXRpYyAoYG91dC9gKS4KCiMjIFdobyB5b3UncmUgd29ya2luZyB3aXRoCgpBICoqbm9uLXByb2dyYW1tZXIgZGVzaWduZXIqKiBpcyBvcGVyYXRpbmcgdGhpcyBwcm9qZWN0LiBBc3N1bWUgbm8gY29kaW5nIGtub3dsZWRnZS4KCi0gRXhwbGFpbiBpbiBwbGFpbiBsYW5ndWFnZTsgYXZvaWQgamFyZ29uLCBvciBkZWZpbmUgaXQgYnJpZWZseSB0aGUgZmlyc3QgdGltZSB5b3UgdXNlIGl0LgotIE1ha2UgdGhlIHRlY2huaWNhbCBkZWNpc2lvbnMgeW91cnNlbGYgcmF0aGVyIHRoYW4gYXNraW5nIHRoZSBkZXNpZ25lciB0byBjaG9vc2UgYmV0d2VlbgogIG9wdGlvbnMgdGhleSBjYW4ndCBldmFsdWF0ZSDigJQgcmVjb21tZW5kLCB0aGVuIHByb2NlZWQuIE9ubHkgYXNrIHdoZW4gaXQncyBhIHByb2R1Y3QsCiAgY29udGVudCwgb3IgdmlzdWFsLWRlc2lnbiBjYWxsIHRoYXQncyBnZW51aW5lbHkgdGhlaXJzLgotIE5ldmVyIGFzc3VtZSBhIGNvbW1hbmQsIHRvb2wsIG9yIGNvbmZpZyBzdGVwIGlzICJvYnZpb3VzLiIgU3BlbGwgb3V0IHdoYXQgdG8gcnVuIGFuZCB3aGF0CiAgc3VjY2VzcyBsb29rcyBsaWtlLgotIFN1cmZhY2UgcmlzayBpbiB0ZXJtcyBvZiBpbXBhY3QgKCJ0aGlzIGNvdWxkIGJyZWFrIHRoZSBsaXZlIHNpdGUiKSwgbm90IGludGVybmFscy4KCiMjIE5vbi1uZWdvdGlhYmxlcwoKLSBSZS12YWxpZGF0ZSBmcmFtZXdvcmssIFVJIGxpYnJhcnksIGFuZCBrZXkgcGFja2FnZXMgYXQgcHJvamVjdCBzdGFydC4gUHJlZmVyIG1haW50YWluZWQsCiAgY3VycmVudCwgaW5kdXN0cnktc3RhbmRhcmQgY2hvaWNlcy4KLSBDb25maWd1cmUgTmV4dC5qcyBmb3Igc3RhdGljIGV4cG9ydCBjb21wYXRpYmlsaXR5LiBEbyBub3QgcmVseSBvbiBydW50aW1lIE5vZGUgZmVhdHVyZXMgaW4KICBwcm9kdWN0aW9uIChzZXJ2ZXIgYWN0aW9ucywgQVBJIHJvdXRlcywgbWlkZGxld2FyZS1kZXBlbmRlbnQgbG9naWMpLgotIFRyZWF0IHRoZSBmcm9udGVuZCBidW5kbGUgYXMgcHVibGljLiBOZXZlciBzaGlwIHNlY3JldHMgaW4gY2xpZW50IGNvZGUuCi0gQmVmb3JlIGRlcGxveW1lbnQsIGVuc3VyZSBidWlsZCBvdXRwdXQgaXMgdXBsb2FkLXJlYWR5IGZvciB0aGUgUEhQIGhvc3QuCgojIyBSZXF1aXJlZCBxdWFsaXR5IGNoZWNrcG9pbnRzCgpSdW4gdGhlIGBxdWFsaXR5LWNoZWNrcG9pbnRgIHNraWxsIGF0OgoKMS4gKipNaWxlc3RvbmUgY2hlY2twb2ludCoqIChkdXJpbmcgZGV2ZWxvcG1lbnQgd2hlbiBhIG1lYW5pbmdmdWwgbWlsZXN0b25lIGlzIHJlYWNoZWQpCjIuICoqUHJlLWRlcGxveW1lbnQgY2hlY2twb2ludCoqIChiZWZvcmUgc2hpcHBpbmcvdXBsb2FkKQoKQ2hlY2twb2ludCBjb21taXQgcHJhY3RpY2U6Ci0gQmVmb3JlIGEgY2hlY2twb2ludCBzdGFydHMgbWFraW5nIGNvZGUgY2hhbmdlcywgYXNrIGZvciAob3IgcmVjb21tZW5kKSBhIHF1aWNrIGNoZWNrcG9pbnQKICBjb21taXQgc28gZml4ZXMgYXJlIGVhc3kgdG8gcmV2aWV3IGFuZCByb2xsIGJhY2sgaWYgbmVlZGVkLgotIElmIGFwcHJvdmVkLCBjcmVhdGUgdGhhdCBjb21taXQgYmVmb3JlIGFwcGx5aW5nIGNoZWNrbGlzdC1kcml2ZW4gZWRpdHMuCgpUaGUgY2hlY2twb2ludCBjb3ZlcnM6Ci0gUGVyZm9ybWFuY2UKLSBEZXBlbmRlbmN5IGN1cnJlbmN5IC8gcGFja2FnZSByZWxldmFuY2UKLSBBY2Nlc3NpYmlsaXR5LCBTRU8sIEdFTwotIFNlY3VyaXR5Ci0gUmV1c2FibGUgYXJjaGl0ZWN0dXJlCi0gQ29kZSBxdWFsaXR5Ci0gUmVzcG9uc2l2ZSBiZWhhdmlvciAobW9iaWxlICsgdGFibGV0KQoKIyMgVGVhbSB3b3JrZmxvdyBkZWZhdWx0cwoKLSBXb3JrIHZpYSBicmFuY2ggKyBQUiBmbG93IChhdm9pZCBkaXJlY3QgY29tbWl0cyB0byBwcm90ZWN0ZWQgbWFpbiBicmFuY2gpLgoKIyMgSG93IHRoaXMgZmlsZSBzaG91bGQgZXZvbHZlCgpLZWVwIHRoaXMgZmlsZSBsaW1pdGVkIHRvIHN0YWJsZSBjb25zdHJhaW50cywgcmVxdWlyZWQgY2hlY2twb2ludHMsIGFuZCBsb25nLWxpdmVkIGRlY2lzaW9ucy4KUHV0IGRldGFpbGVkIHdvcmtmbG93cy9jaGVja2xpc3RzIGluIHNraWxscywgYW5kIG9ubHkgYWRkIG5ldyBydWxlcyBoZXJlIHdoZW4gdGhleSByZXBlYXQgYWNyb3NzIHRhc2tzLgo=";
+const SKILL_MD_B64 = "LS0tCm5hbWU6IHF1YWxpdHktY2hlY2twb2ludApkZXNjcmlwdGlvbjogUnVucyB0aGUgbWlsZXN0b25lIGFuZCBwcmUtZGVwbG95bWVudCBxdWFsaXR5IGNoZWNrbGlzdCBmb3IgZGVzaWduZXItYnVpbHQgc3RhdGljIHNpdGVzIGRlcGxveWVkIHRvIGEgUEhQIHNlcnZlci4gQ292ZXJzIHBlcmZvcm1hbmNlLCBkZXBlbmRlbmN5IGN1cnJlbmN5LCBhY2Nlc3NpYmlsaXR5L1NFTy9HRU8sIHNlY3VyaXR5LCByZXVzYWJsZSBhcmNoaXRlY3R1cmUsIGNvZGUgcXVhbGl0eSwgYW5kIG1vYmlsZS90YWJsZXQgcmVzcG9uc2l2ZW5lc3MuIFVzZSB3aGVuIGEgZGV2ZWxvcG1lbnQgbWlsZXN0b25lIGlzIHJlYWNoZWQgYW5kIGFnYWluIGJlZm9yZSBkZXBsb3lpbmcuCi0tLQoKIyBRdWFsaXR5IGNoZWNrcG9pbnQKCkEgZ3VpZGVkIGF1ZGl0IGEgZGVzaWduZXIgY2FuIHRyaWdnZXIgYXQgdHdvIG1vbWVudHMuIFJ1biBpdCwgcmVwb3J0IGZpbmRpbmdzIGJ5IHNldmVyaXR5LApmaXggdGhlIGNsZWFyLWN1dCBpc3N1ZXMsIGFuZCBoYW5kIHRoZSBqdWRnbWVudCBjYWxscyBiYWNrIHRvIHRoZSBkZXNpZ25lci4KCkRlcGxveSB0YXJnZXQgY29udGV4dDogKipzdGF0aWMgZXhwb3J0IHRvIGEgUEhQIC8gQXBhY2hlIHNlcnZlciwgbm8gTm9kZSBydW50aW1lLioqIEp1ZGdlCmV2ZXJ5dGhpbmcgYWdhaW5zdCB0aGF0LgoKIyMgV2hlbiB0byBydW4KCkFzayB3aGljaCBjaGVja3BvaW50IHRoaXMgaXM6CgotICoqTWlsZXN0b25lKiog4oCUIGEgbWVhbmluZ2Z1bCBjaHVuayBvZiB0aGUgc2l0ZSBpcyBkb25lLiBDYXRjaCBwcm9ibGVtcyB3aGlsZSB0aGV5J3JlIGNoZWFwLgotICoqUHJlLWRlcGxveW1lbnQqKiDigJQgYmVmb3JlIGFueSB1cGxvYWQgdG8gdGhlIHNlcnZlci4gRXZlcnl0aGluZyBiZWxvdywgcGx1cyB0aGUKICBkZXBsb3ktcmVhZGluZXNzIGdhdGUuCgojIyBIb3cgdG8gcnVuCgpHbyBhcmVhIGJ5IGFyZWEuIEZvciBlYWNoIGZpbmRpbmcsIHN0YXRlOiAqKnNldmVyaXR5KiogKGJsb2NrZXIgLyBzaG91bGQtZml4IC8gbmljZS10by1oYXZlKSwKd2hlcmUgaXQgaXMsIHdoeSBpdCBtYXR0ZXJzLCBhbmQgdGhlIGZpeC4gQXBwbHkgdW5hbWJpZ3VvdXMgZml4ZXM7IGxpc3QgYW55dGhpbmcgdGhhdCBuZWVkcyBhCmRlc2lnbiBvciBwcm9kdWN0IGRlY2lzaW9uLiBGaW5pc2ggd2l0aCBhIHdyaXR0ZW4gcmVwb3J0LgoKIyMgVGhlIGNoZWNrbGlzdAoKIyMjIDEuIFBlcmZvcm1hbmNlCi0gSW1hZ2VzOiBtb2Rlcm4gZm9ybWF0cyAoV2ViUC9BVklGKSwgY29ycmVjdGx5IHNpemVkLCBsYXp5LWxvYWRlZCBiZWxvdyB0aGUgZm9sZC4gKFN0YXRpYwogIGV4cG9ydCB1c2VzIGBpbWFnZXMudW5vcHRpbWl6ZWRgLCBzbyBjb3JyZWN0IHNpemluZyBpcyBvbiB1cywgbm90IGFuIG9wdGltaXplci4pCi0gRm9udHM6IHN1YnNldCwgcHJlbG9hZGVkLCBmZXcgd2VpZ2h0czsgbm8gbGF5b3V0IHNoaWZ0LgotIEJ1bmRsZTogbm8gb3ZlcnNpemVkIGRlcGVuZGVuY2llczsgY29kZS1zcGxpdCBoZWF2eSByb3V0ZXM7IGluc3BlY3QgdGhlIHByb2R1Y3Rpb24gYnVpbGQKICBvdXRwdXQgZm9yIGxhcmdlIGNodW5rcy4KLSBSdW4gTGlnaHRob3VzZSAob3IgdGhlIENocm9tZSBEZXZUb29scyBNQ1ApIGFnYWluc3QgdGhlICoqYnVpbHQgYG91dC9gIHNpdGUqKiwgbm90IGRldi4KCiMjIyAyLiBEZXBlbmRlbmN5IGN1cnJlbmN5Ci0gTGlzdCBkZXBlbmRlbmNpZXM7IGNvbXBhcmUgaW5zdGFsbGVkIHZzIGxhdGVzdCAoYG5wbSBvdXRkYXRlZGApLgotIEZvciBlYWNoIG1ham9yIG9uZTogaXMgaXQgc3RpbGwgbWFpbnRhaW5lZCBhbmQgc3RpbGwgdGhlIGluZHVzdHJ5LXN0YW5kYXJkIHBpY2s/IFZlcmlmeQogIGFnYWluc3QgaXRzIGRvY3MgLyByZWNlbnQgcmVsZWFzZXMg4oCUIG5vdCBtZW1vcnkuIEZsYWcgZGVwcmVjYXRlZCBvciBhYmFuZG9uZWQgcGFja2FnZXMgYW5kCiAgcHJvcG9zZSB0aGUgY3VycmVudCBzdGFuZGFyZC4KLSBgbnBtIGF1ZGl0YCBmb3Iga25vd24gdnVsbmVyYWJpbGl0aWVzOyByZXNvbHZlIG9yIG5vdGUgdGhlbS4KCiMjIyAzLiBBY2Nlc3NpYmlsaXR5LCBTRU8gJiBHRU8KLSAqKkExMXkgKFdDQUcgMi4yIEFBKToqKiBzZW1hbnRpYyBIVE1MLCBoZWFkaW5nIG9yZGVyLCBhbHQgdGV4dCwgbGFiZWxzLCBmb2N1cyBvcmRlciwKICA0LjU6MSBjb250cmFzdCwgYSBmdWxsIGtleWJvYXJkIHdhbGssIGBwcmVmZXJzLXJlZHVjZWQtbW90aW9uYC4gKGF4ZSB2aWEgdGhlIERldlRvb2xzIE1DUAogIGNhdGNoZXMgfjQwJTsgdGhlIGtleWJvYXJkIHBhc3MgY2F0Y2hlcyB0aGUgcmVzdC4pCi0gKipTRU86KiogcGVyLXBhZ2UgdGl0bGUvZGVzY3JpcHRpb24sIGNhbm9uaWNhbCwgT3BlbiBHcmFwaCAvIFR3aXR0ZXIgY2FyZHMsIGBzaXRlbWFwLnhtbGAsCiAgYHJvYm90cy50eHRgLCB2YWxpZCBKU09OLUxEIHN0cnVjdHVyZWQgZGF0YS4KLSAqKkdFTyAoZ2VuZXJhdGl2ZS1lbmdpbmUgb3B0aW1pemF0aW9uKToqKiBjbGVhbiBzZW1hbnRpYyBzdHJ1Y3R1cmUgYW5kIGhlYWRpbmdzLAogIGRlc2NyaXB0aXZlIHJlYWwgdGV4dCAobm90IHRleHQtaW4taW1hZ2VzKSwgc2VsZi1jb250YWluZWQgYW5zd2VycywgYW5kIGFuIGBsbG1zLnR4dGAgd2hlcmUKICBhcHByb3ByaWF0ZSDigJQgc28gQUkgZW5naW5lcyBjYW4gcGFyc2UgYW5kIGNpdGUgdGhlIHNpdGUuCgojIyMgNC4gU2VjdXJpdHkgKHN0YXRpYy1zaXRlIGxlbnMpCi0gVGhlIHdob2xlIGJ1bmRsZSBpcyBwdWJsaWM6IGNvbmZpcm0gKipubyBzZWNyZXRzLCBrZXlzLCBvciB0b2tlbnMqKiBpbiB0aGUgc2hpcHBlZCBKUyDigJQgYW55CiAgbGl2ZSBvbiB0aGUgZXh0ZXJuYWwgQVBJIG9ubHkuCi0gRXh0ZXJuYWwgQVBJIGNhbGxzIGRvbid0IGV4cG9zZSBwcml2aWxlZ2VkIGtleXM7IHNlbnNpdGl2ZSBsb2dpYyBpcyBiZWhpbmQgdGhlIEFQSSwgbm90CiAgY2xpZW50LXNpZGUgZ2F0aW5nLgotIElucHV0IGhhbmRsaW5nIGdvZXMgdGhyb3VnaCB0aGUgdmFsaWRhdGVkIGZvcm1zIChSSEYgKyBab2QpOyBub3RoaW5nIGhhbmQtcm9sbGVkLgotIFNlY3VyaXR5IGhlYWRlcnM6IHdpdGggbm8gTm9kZSwgdGhlc2UgYXJlIHNldCBvbiBBcGFjaGUgKGAuaHRhY2Nlc3NgKSDigJQgQ1NQLCBIU1RTLAogIFgtQ29udGVudC1UeXBlLU9wdGlvbnMsIFJlZmVycmVyLVBvbGljeS4gTm90ZSB3aGF0J3MgbWlzc2luZy4KCiMjIyA1LiBSZXVzYWJsZSBhcmNoaXRlY3R1cmUKLSBDb21wb25lbnRzIGFyZSByZXVzZWQsIG5vdCBjb3B5LXBhc3RlZDsgc2hhcmVkIGxvZ2ljIGlzIGZhY3RvcmVkIG91dC4KLSBEZXNpZ24gdG9rZW5zIHJldXNlZCAobm8gc3RyYXkgaGV4IC8gbWFnaWMgbnVtYmVycyk7IG9uZSBjb21wb25lbnQgd2l0aCB2YXJpYW50cyBiZWF0cyBmb3VyCiAgbmVhci1kdXBsaWNhdGVzLgotIENsZWFyIHNlcGFyYXRpb246IFVJIHZzIGRhdGEgYWNjZXNzIChgbGliL2FwaS9gKSB2cyBjb250ZW50LgoKIyMjIDYuIENvZGUgcXVhbGl0eQotIExpbnQsIHR5cGVjaGVjaywgYW5kIHRlc3RzIGFsbCBncmVlbi4gTm8gZGVhZCBjb2RlLCBzdHJheSBgY29uc29sZS5sb2dgLCBvciBjb21tZW50ZWQtb3V0IGJsb2Nrcy4KLSBEZXNjcmlwdGl2ZSBuYW1lczsgbm8gYGFueWAgd2l0aG91dCBjYXVzZTsgY29uc2lzdGVudCB3aXRoIHRoZSByZXN0IG9mIHRoZSBjb2RlYmFzZS4KCiMjIyA3LiBSZXNwb25zaXZlIChtb2JpbGUgJiB0YWJsZXQpCi0gVGVzdCBhdCAqKjM3NXB4KiogKG1vYmlsZSksICoqNzY4cHgqKiAodGFibGV0KSwgYW5kIGEgZGVza3RvcCB3aWR0aC4gTm8gaG9yaXpvbnRhbCBzY3JvbGw7CiAgbm90aGluZyBvdmVybGFwcyBvciBjbGlwcy4KLSBUb3VjaCB0YXJnZXRzIOKJpSA0NHB4OyB0YXAgc3RhdGVzIHdvcms7IG5hdi9tZW51cyB1c2FibGUgb24gdG91Y2guCi0gRmx1aWQgbGF5b3V0IChGbGV4Ym94IC8gR3JpZCAvIGBjbGFtcCgpYCksIG5vdCBoYXJkY29kZWQgcGl4ZWwgd2lkdGhzLgoKIyMgUHJlLWRlcGxveW1lbnQgZ2F0ZSAoYWRkaXRpb25hbCkKLSBgbnBtIHJ1biBidWlsZGAgc3VjY2VlZHMgd2l0aCBzdGF0aWMgZXhwb3J0OyBwcmV2aWV3IGBvdXQvYCB2aWEgYG5weCBzZXJ2ZSBvdXRgIGFuZCBjbGljawogIHRocm91Z2gg4oCUIG5vIGJyb2tlbiByb3V0ZXMsIGltYWdlcywgb3IgYXNzZXRzLgotIEFzc2V0L2xpbmsgcGF0aHMgcmVzb2x2ZSBmb3IgdGhlIHNlcnZlcidzIGRpcmVjdG9yeSAoYGJhc2VQYXRoYCAvIGBhc3NldFByZWZpeGApOwogIGB0cmFpbGluZ1NsYXNoYCBiZWhhdmlvciBtYXRjaGVzIEFwYWNoZTsgYSB3b3JraW5nIDQwNCBwYWdlLgotIENvbmZpcm0gdGhlIHByZXZpb3VzIGJ1aWxkIGlzIHJldGFpbmVkIHNvIHJvbGxiYWNrID0gcmUtdXBsb2FkLgoKIyMgT3V0cHV0CldyaXRlIGBDSEVDS1BPSU5ULm1kYCAob3IgcGFzdGUgYSByZXBvcnQpOiBlYWNoIGFyZWEgbWFya2VkICoqcGFzcyAvIGZpeC1hcHBsaWVkIC8KbmVlZHMtZGVjaXNpb24qKiwgd2l0aCBhIHNob3J0IGFjdGlvbiBsaXN0LiBUaGUgZGVzaWduZXIgc2lnbnMgb2ZmIGJlZm9yZSB0aGUgbWlsZXN0b25lCmNvbnRpbnVlcyBvciBkZXBsb3ltZW50IHByb2NlZWRzLgo=";
+
+const DL_PERMISSIONS = {
+  allow: [
+    "Bash(npm run *)",
+    "Bash(npm i *)",
+    "Bash(npm ls *)",
+    "Bash(npm outdated)",
+    "Bash(npm audit)",
+    "Bash(npx next *)",
+    "Bash(npx serve out)"
+  ]
+};
+const DL_HOOKS = {
+  mac: {
+    Notification: [{ matcher: "", hooks: [{ type: "command", command: "osascript -e 'display notification \"Claude needs your input\" with title \"Claude Code\" sound name \"Glass\"'" }] }],
+    Stop: [{ matcher: "", hooks: [{ type: "command", command: "osascript -e 'display notification \"Task finished\" with title \"Claude Code\" sound name \"Ping\"'" }] }]
+  },
+  windows: {
+    Notification: [{ matcher: "", hooks: [{ type: "command", command: "powershell -c \"[System.Media.SystemSounds]::Exclamation.Play()\"" }] }],
+    Stop: [{ matcher: "", hooks: [{ type: "command", command: "powershell -c \"[System.Media.SystemSounds]::Asterisk.Play()\"" }] }]
+  }
+};
+
+function b64ToBytes(b64){
+  const bin = atob(b64.replace(/\s+/g, ''));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function crc32(bytes){
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++){
+    let c = (crc ^ bytes[i]) & 0xFF;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    crc = (crc >>> 8) ^ c;
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+// Minimal STORE (uncompressed) ZIP writer — enough for a few text files.
+function buildZip(files){
+  const enc = new TextEncoder();
+  const parts = [];
+  let offset = 0;
+  const central = [];
+  const u16 = n => { const b = new Uint8Array(2); new DataView(b.buffer).setUint16(0, n & 0xFFFF, true); return b; };
+  const u32 = n => { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, n >>> 0, true); return b; };
+  const push = a => { parts.push(a); offset += a.length; };
+
+  for (const f of files){
+    const name = enc.encode(f.name);
+    const data = f.data;
+    const crc = crc32(data);
+    const local = offset;
+    push(u32(0x04034b50)); push(u16(20)); push(u16(0)); push(u16(0));
+    push(u16(0)); push(u16(0)); push(u32(crc)); push(u32(data.length)); push(u32(data.length));
+    push(u16(name.length)); push(u16(0)); push(name); push(data);
+    central.push({ name, crc, size: data.length, local });
+  }
+  const cdStart = offset;
+  let cdSize = 0;
+  for (const c of central){
+    const rec = [];
+    const add = a => { rec.push(a); cdSize += a.length; };
+    add(u32(0x02014b50)); add(u16(20)); add(u16(20)); add(u16(0)); add(u16(0));
+    add(u16(0)); add(u16(0)); add(u32(c.crc)); add(u32(c.size)); add(u32(c.size));
+    add(u16(c.name.length)); add(u16(0)); add(u16(0)); add(u16(0)); add(u16(0));
+    add(u32(0)); add(u32(c.local)); add(c.name);
+    rec.forEach(push);
+  }
+  push(u32(0x06054b50)); push(u16(0)); push(u16(0));
+  push(u16(central.length)); push(u16(central.length));
+  push(u32(cdSize)); push(u32(cdStart)); push(u16(0));
+
+  let total = 0; parts.forEach(p => total += p.length);
+  const out = new Uint8Array(total);
+  let p = 0; parts.forEach(c => { out.set(c, p); p += c.length; });
+  return out;
+}
+
+function downloadBoilerplate(os){
+  const enc = new TextEncoder();
+  const settings = { permissions: DL_PERMISSIONS, hooks: DL_HOOKS[os] };
+  const settingsText = JSON.stringify(settings, null, 2) + "\n";
+  const files = [
+    { name: "boilerplate/CLAUDE.md", data: b64ToBytes(CLAUDE_MD_B64) },
+    { name: "boilerplate/.claude/settings.local.json", data: enc.encode(settingsText) },
+    { name: "boilerplate/.claude/skills/quality-checkpoint/SKILL.md", data: b64ToBytes(SKILL_MD_B64) }
+  ];
+  const zip = buildZip(files);
+  const blob = new Blob([zip], { type: "application/zip" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = os === "mac" ? "boilerplate-macos.zip" : "boilerplate-windows.zip";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+document.querySelectorAll('.dl-btn').forEach(btn =>
+  btn.addEventListener('click', () => downloadBoilerplate(btn.dataset.os))
+);
+</script>
+</body>
+</html>

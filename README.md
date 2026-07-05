@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Designers as Devs
 
-## Getting Started
+This repository **authors** a starter kit that helps designers ship production code with
+Claude Code. The kit is the product; this repo is where it's written and maintained.
 
-First, run the development server:
+## The deliverable lives in [`boilerplate/`](./boilerplate/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Everything under `boilerplate/` is the output asset — copy its contents into the root of a
+designer's project to set them up:
+
+```
+boilerplate/
+├── CLAUDE.md                                   # the always-on agent contract
+└── .claude/
+    ├── settings.local.json                     # permissions + macOS desktop notifications
+    ├── settings.local.windows.json             # permissions + Windows desktop notifications
+    └── skills/
+        └── quality-checkpoint/SKILL.md         # milestone & pre-deploy quality checklist
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`settings.local.json` ships with **macOS** notification hooks (via `osascript`) as the default.
+`settings.local.windows.json` is the Windows variant (via `powershell` system sounds) — on
+Windows, rename it to `settings.local.json`. The download button (below) does this swap for you.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The human playbook, [`index.html`](./index.html), stays at the repo root so it can be opened
+directly in a browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Two ways to get it into a project
 
-## Learn More
+1. **Download button** — open `index.html` and click *Download for macOS* or *Download for
+   Windows*. It builds a `.zip` of the boilerplate in the browser (no server needed) with the
+   right OS's notifications already named `settings.local.json`. Unzip, then copy `CLAUDE.md`
+   and `.claude/` into the project root.
+2. **Copy the folder** directly:
+   ```sh
+   cp -R boilerplate/. /path/to/your-project/   # CLAUDE.md, settings, and the skill
+   cp index.html /path/to/your-project/         # the human playbook (optional)
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+> The download embeds base64 copies of `CLAUDE.md` and the skill inside `index.html`. After
+> editing either file, refresh the embed — see the `DOWNLOAD THE BOILERPLATE` comment in
+> `index.html` for the one-line `base64` commands.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Why `boilerplate/` and not the repo root
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The kit files are deliverables, not configuration for *this* repo. Kept at the root,
+`CLAUDE.md` and the skill would be loaded as if they governed the kit-authoring work itself.
+Nesting them under `boilerplate/` keeps that boundary clear: the repo root is the workshop,
+and `boilerplate/` is what ships.
