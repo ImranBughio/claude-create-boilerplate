@@ -1,0 +1,34 @@
+# ── Password protection for your static site (Apache / PHP hosting) ─────────
+# HTTP Basic Auth: visitors must enter a username + password to see the site.
+# Upload this file AND .htpasswd into the same folder as your built site
+# (the folder you put on the server — next to index.html).
+#
+# ONE thing to set: AuthUserFile must be the ABSOLUTE path to .htpasswd on the
+# server, e.g. /home/<your-username>/public_html/<your-folder>/.htpasswd
+# See PASSWORD-PROTECTION.md — or just ask Claude Code to set it up for you.
+
+DirectoryIndex index.html
+
+# If this static site sits in a subfolder of another app (e.g. WordPress),
+# stop that app's rewrite rules from hijacking this folder — serve real files
+# here as-is. (Harmless if there's no such app.)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+</IfModule>
+
+AuthType Basic
+AuthName "Restricted"
+AuthUserFile "/absolute/path/to/your/site/.htpasswd"
+Require valid-user
+
+# Some hosts (e.g. when a CMS runs at the domain root) reroute a 401 through the
+# app and turn it into a 404, so the browser never shows the login box. Force a
+# real, plain 401 for this folder.
+ErrorDocument 401 "Authentication required."
+
+<FilesMatch "^\.(htaccess|htpasswd)$">
+  Require all denied
+</FilesMatch>

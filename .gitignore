@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# site deployment credential (real password hash for creategroup.me) — do not commit
+/.htpasswd
+
 # vercel
 .vercel
 

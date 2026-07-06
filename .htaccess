@@ -1,0 +1,33 @@
+# ── Password protection for creategroup.me/claude-starter-pack ──────────────
+# HTTP Basic Auth: the site can't be opened without the username + password.
+#
+# ONE thing you must set before uploading: AuthUserFile below must be the
+# ABSOLUTE path to the .htpasswd file on the server. On cPanel-style hosting it
+# usually looks like:
+#   /home/<your-cpanel-username>/public_html/claude-starter-pack/.htpasswd
+# Update the path, upload this file, .htpasswd AND index.html to the folder.
+
+DirectoryIndex index.html
+
+# This static site lives in a subfolder of a WordPress site. Stop WordPress's
+# root rewrite rules from hijacking this folder — serve real files here as-is.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+</IfModule>
+
+AuthType Basic
+AuthName "Create — Starter Pack (restricted)"
+AuthUserFile "/home/creategroup/public_html/claude-starter-pack/.htpasswd"
+Require valid-user
+
+# This host reroutes a 401 through WordPress and turns it into a 404, so the
+# browser never shows the login box. Force a real, plain 401 for this folder.
+ErrorDocument 401 "Authentication required."
+
+# Never let anyone download the password files themselves.
+<FilesMatch "^\.(htaccess|htpasswd)$">
+  Require all denied
+</FilesMatch>

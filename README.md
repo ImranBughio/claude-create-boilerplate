@@ -12,6 +12,9 @@ it up.
 boilerplate/
 ├── normal/                                     # static sites → PHP/Apache server
 │   ├── CLAUDE.md                               # short, always-on brief
+│   ├── .htaccess                               # Private mode: Apache Basic-Auth config
+│   ├── .htpasswd                               # Private mode: username + hashed password (create/changeme)
+│   ├── PASSWORD-PROTECTION.md                  # Private mode: how to set the login
 │   └── .claude/
 │       ├── settings.local.mac.json             # permissions + macOS notifications
 │       ├── settings.local.windows.json         # permissions + Windows notifications
@@ -19,6 +22,7 @@ boilerplate/
 │           └── quality-checkpoint/SKILL.md     # milestone & pre-deploy audit
 └── advanced/                                   # backend services (Python/FastAPI)
     ├── CLAUDE.md                               # short brief: stack, boundaries, ask DX
+    ├── README.md                               # run-this-first setup prompt (GitHub + backend + access)
     └── .claude/
         ├── settings.local.mac.json             # Python/Docker perms + macOS notifications
         ├── settings.local.windows.json         # Python/Docker perms + Windows notifications
@@ -30,6 +34,20 @@ boilerplate/
 - **Normal** — static sites (Next.js/Astro/Vite/plain HTML) exported to a PHP/Apache server.
 - **Advanced** — Python + FastAPI + SQLAlchemy backends with SQLite or cloud MySQL, Docker,
   Ruff, and Pytest. Still operated by a non-technical person, following the documented setup.
+
+### Public vs Private (access toggle)
+
+The download page has a **Public / Private** toggle (default **Private**) above the kit switcher.
+It changes what each kit ships:
+
+- **Normal + Private** → also ships `.htaccess` + `.htpasswd` (Apache HTTP Basic Auth) and
+  `PASSWORD-PROTECTION.md`, and **drops the SEO/GEO section** from the quality-checkpoint skill
+  (a password-gated site is never crawled, so it's dead weight).
+- **Advanced** → always ships `README.md`; Private mode injects an instruction for the setup
+  prompt to add app-level authentication. Public mode leaves the same run-first prompt without it.
+
+The starter Normal login is `create` / `changeme` — **change it before going live** (see the
+kit's `PASSWORD-PROTECTION.md`).
 
 Each `CLAUDE.md` stays deliberately short — the detailed guidance lives in the skills, and the
 full human-readable setup walkthrough (GitHub onboarding, do's/don'ts, what your team handles)
@@ -56,9 +74,20 @@ ships it under that name.
    rm -f settings.local.mac.json settings.local.windows.json    # drop the unused variant
    ```
 
-> `index.html` embeds base64 copies of every shipped file (both kits' `CLAUDE.md`, skills, and
-> settings). After editing any source file, refresh its embed — see the `DOWNLOAD THE
-> BOILERPLATE` comment in `index.html` for the one-line `base64` command.
+> `index.html` embeds base64 copies of every shipped file (both kits' `CLAUDE.md`, skills,
+> settings, the Normal protection files, and the Advanced `README.md`). After editing any source
+> file, refresh its embed — see the `DOWNLOAD THE BOILERPLATE` comment in `index.html` for the
+> one-line `base64` command. The Advanced `README.md` uses a `{{MODE}}` token that the download
+> replaces with `public`/`private`; the private Normal download strips the skill's SEO/GEO block
+> in JS. Both transforms live in `downloadBoilerplate()`.
+
+## Deploying this site (creategroup.me/claude-starter-pack)
+
+The repo root has its own `.htaccess` + `.htpasswd` (HTTP Basic Auth) so the published page is
+password-protected. Before uploading, set `AuthUserFile` in `.htaccess` to the **absolute** server
+path of `.htpasswd` (cPanel shows it, usually `/home/<user>/public_html/claude-starter-pack/`).
+The real credential hash (`/.htpasswd`) is **git-ignored** — regenerate/rotate it with
+`htpasswd -m .htpasswd create`.
 
 ## Why `boilerplate/` and not the repo root
 

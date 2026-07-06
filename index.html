@@ -14,7 +14,7 @@
     --panel: #161616;
     --ink: #ffffff;
     --accent: #e8591b;   /* Normal kit */
-    --adv: #c2410c;      /* Advanced kit — a deeper shade of orange */
+    --adv: #f97316;      /* Advanced kit — a brighter, warmer orange */
     --n300: #d4d4d4;
     --n400: #a3a3a3;
     --n500: #737373;
@@ -46,43 +46,52 @@
   /* Hero */
   .hero { padding: 4rem 0 2.2rem; }
 
+  /* Public / Private access toggle */
+  .access { display: flex; align-items: center; gap: 0.9rem; margin-top: 2rem; flex-wrap: wrap; }
+  .access-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n500); font-weight: 700; }
+  .seg { display: inline-flex; gap: 4px; padding: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .seg-btn { cursor: pointer; font-family: var(--sans); font-size: 0.8rem; font-weight: 600; color: var(--n400); background: transparent; border: none; padding: 0.45rem 0.9rem; border-radius: 5px; transition: background .15s, color .15s; }
+  .seg-btn .seg-sub { font-weight: 400; opacity: .75; }
+  .seg-btn:hover { color: var(--ink); }
+  .seg-btn.active { background: #fff; color: var(--bg); }
+  .mode-note { margin-top: 1rem; font-size: 0.82rem; color: var(--a); }
+
   /* ── Sticky mode switcher ─────────────────────────── */
   .switcher {
     position: sticky; top: 0; z-index: 30;
     background: rgba(14,14,14,.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
   }
-  .switcher .wrap { display: flex; align-items: center; gap: 1.1rem; padding-top: 0.7rem; padding-bottom: 0.7rem; }
-  .switch-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n500); font-weight: 700; flex-shrink: 0; }
+  .switcher .wrap { display: flex; align-items: stretch; gap: 1.1rem; padding-top: 0.5rem; padding-bottom: 0; }
+  .switch-label { align-self: center; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--n500); font-weight: 700; flex-shrink: 0; }
   @media (max-width: 560px){ .switch-label { display: none; } }
-  .tabs { display: flex; gap: 6px; padding: 5px; background: var(--panel); border: 1px solid var(--line); border-radius: 11px; flex: 1; }
+  .tabs { display: flex; gap: 6px; flex: 1; }
   .tab {
     flex: 1; position: relative; cursor: pointer; font-family: var(--sans); text-align: left; color: var(--n400);
-    background: transparent; border: none; padding: 0.55rem 1rem; border-radius: 7px;
+    background: transparent; border: none; padding: 0.55rem 1rem; border-radius: 8px 8px 0 0;
     transition: background .15s, color .15s; display: flex; align-items: center; gap: 0.6rem;
   }
   .tab .tnum { font-family: var(--mono); font-size: 0.75rem; opacity: .5; }
   .tab .tname { font-size: 0.92rem; font-weight: 700; display: block; }
   .tab .k { font-weight: 400; color: var(--n500); font-size: 0.72rem; display: block; margin-top: 1px; }
   .tab:hover { color: var(--ink); }
-  .tab[data-tab="normal"].active { background: var(--accent); color: #fff; }
-  .tab[data-tab="advanced"].active { background: var(--adv); color: #fff; }
+  .tab[data-tab="normal"].active { background: var(--adv); color: #fff; }
+  .tab[data-tab="advanced"].active { background: var(--accent); color: #fff; }
   .tab.active .tnum { opacity: .8; }
   .tab.active .k { color: rgba(255,255,255,.85); }
-  /* Arrow piercing from the active tab down into the content below */
+  /* Arrow attached flush to the active tab's squared-off bottom edge */
   .tab.active::after {
     content: ""; position: absolute; left: 50%; transform: translateX(-50%);
-    top: calc(100% + 16px); width: 0; height: 0;
+    top: 100%; width: 0; height: 0;
     border-left: 10px solid transparent; border-right: 10px solid transparent;
-    border-top: 10px solid var(--accent);
-    filter: drop-shadow(0 3px 3px rgba(0,0,0,.35));
+    border-top: 10px solid var(--adv);
   }
-  .tab[data-tab="advanced"].active::after { border-top-color: var(--adv); }
+  .tab[data-tab="advanced"].active::after { border-top-color: var(--accent); }
 
   /* ── Views (theme per kit via --a) ────────────────── */
-  .view { display: none; --a: var(--accent); border-top: 3px solid var(--a); }
+  .view { display: none; --a: var(--adv); }
   .view.active { display: block; }
-  #view-advanced { --a: var(--adv); }
+  #view-advanced { --a: var(--accent); }
   .view .wrap { padding-top: 2.4rem; padding-bottom: 4rem; }
 
   .kit-head { display: flex; align-items: center; gap: 0.7rem; }
@@ -176,6 +185,14 @@
       people</strong>. Each kit teaches the agent the setup, the guardrails, and when to run its
       quality checks. Choose the kit that matches your project.
     </p>
+
+    <div class="access">
+      <span class="access-label">Access</span>
+      <div class="seg" role="radiogroup" aria-label="Access mode">
+        <button class="seg-btn" data-access="public" role="radio" aria-checked="false">Public</button>
+        <button class="seg-btn active" data-access="private" role="radio" aria-checked="true">Private<span class="seg-sub"> · password-protected</span></button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -213,6 +230,8 @@
       <button class="dl-btn alt" data-tier="normal" data-os="windows">Download for Windows</button>
     </div>
 
+    <p class="mode-note" data-note="normal"></p>
+
     <div class="inside">
       <div class="row"><span class="fname">CLAUDE.md</span><span class="fdesc">The short, always-on brief: who's operating, static→PHP, when to run the checkpoint.</span></div>
       <div class="row"><span class="fname">.claude/skills/quality-checkpoint</span><span class="fdesc">The milestone &amp; pre-deploy audit checklist.</span></div>
@@ -243,7 +262,10 @@
       <button class="dl-btn alt" data-tier="advanced" data-os="windows">Download for Windows</button>
     </div>
 
+    <p class="mode-note" data-note="advanced"></p>
+
     <div class="inside">
+      <div class="row"><span class="fname">README.md</span><span class="fdesc">Run this first — the setup prompt that scaffolds the backend, sets access, and pushes to GitHub.</span></div>
       <div class="row"><span class="fname">CLAUDE.md</span><span class="fdesc">The short brief: default stack, the hard boundaries, ask the team for credentials.</span></div>
       <div class="row"><span class="fname">.claude/skills/backend-scaffold</span><span class="fdesc">Stand up a new backend — structure, Docker, config, database, FastAPI baseline.</span></div>
       <div class="row"><span class="fname">.claude/skills/backend-quality-checkpoint</span><span class="fdesc">The milestone &amp; pre-deploy audit for backend services.</span></div>
@@ -400,6 +422,11 @@ const SKILL_ADVANCED_QC_B64 = "LS0tCm5hbWU6IGJhY2tlbmQtcXVhbGl0eS1jaGVja3BvaW50C
 const SETTINGS_ADVANCED_MAC_B64 = "ewogICJwZXJtaXNzaW9ucyI6IHsKICAgICJhbGxvdyI6IFsKICAgICAgIkJhc2godXYgKikiLAogICAgICAiQmFzaChweXRob24gLW0gKikiLAogICAgICAiQmFzaChweXRob24zIC1tICopIiwKICAgICAgIkJhc2gocGlwIGluc3RhbGwgKikiLAogICAgICAiQmFzaChwaXAgbGlzdCkiLAogICAgICAiQmFzaChweXRlc3QgKikiLAogICAgICAiQmFzaChydWZmICopIiwKICAgICAgIkJhc2goYWxlbWJpYyAqKSIsCiAgICAgICJCYXNoKHV2aWNvcm4gKikiLAogICAgICAiQmFzaChkb2NrZXIgY29tcG9zZSAqKSIsCiAgICAgICJCYXNoKGRvY2tlciBidWlsZCAqKSIsCiAgICAgICJCYXNoKGRvY2tlciBwcykiCiAgICBdLAogICAgImRlbnkiOiBbCiAgICAgICJSZWFkKC4vLmVudikiLAogICAgICAiUmVhZCguLy5lbnYubG9jYWwpIiwKICAgICAgIlJlYWQoLi8uZW52LmRldmVsb3BtZW50KSIsCiAgICAgICJSZWFkKC4vLmVudi5wcm9kdWN0aW9uKSIsCiAgICAgICJSZWFkKC4vLmVudi5zdGFnaW5nKSIKICAgIF0KICB9LAogICJob29rcyI6IHsKICAgICJOb3RpZmljYXRpb24iOiBbCiAgICAgIHsKICAgICAgICAibWF0Y2hlciI6ICIiLAogICAgICAgICJob29rcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInR5cGUiOiAiY29tbWFuZCIsCiAgICAgICAgICAgICJjb21tYW5kIjogIm9zYXNjcmlwdCAtZSAnZGlzcGxheSBub3RpZmljYXRpb24gXCJDbGF1ZGUgbmVlZHMgeW91ciBpbnB1dFwiIHdpdGggdGl0bGUgXCJDbGF1ZGUgQ29kZVwiIHNvdW5kIG5hbWUgXCJHbGFzc1wiJyIKICAgICAgICAgIH0KICAgICAgICBdCiAgICAgIH0KICAgIF0sCiAgICAiU3RvcCI6IFsKICAgICAgewogICAgICAgICJtYXRjaGVyIjogIiIsCiAgICAgICAgImhvb2tzIjogWwogICAgICAgICAgewogICAgICAgICAgICAidHlwZSI6ICJjb21tYW5kIiwKICAgICAgICAgICAgImNvbW1hbmQiOiAib3Nhc2NyaXB0IC1lICdkaXNwbGF5IG5vdGlmaWNhdGlvbiBcIlRhc2sgZmluaXNoZWRcIiB3aXRoIHRpdGxlIFwiQ2xhdWRlIENvZGVcIiBzb3VuZCBuYW1lIFwiUGluZ1wiJyIKICAgICAgICAgIH0KICAgICAgICBdCiAgICAgIH0KICAgIF0KICB9Cn0K";
 const SETTINGS_ADVANCED_WIN_B64 = "ewogICJwZXJtaXNzaW9ucyI6IHsKICAgICJhbGxvdyI6IFsKICAgICAgIkJhc2godXYgKikiLAogICAgICAiQmFzaChweXRob24gLW0gKikiLAogICAgICAiQmFzaChweXRob24zIC1tICopIiwKICAgICAgIkJhc2gocGlwIGluc3RhbGwgKikiLAogICAgICAiQmFzaChwaXAgbGlzdCkiLAogICAgICAiQmFzaChweXRlc3QgKikiLAogICAgICAiQmFzaChydWZmICopIiwKICAgICAgIkJhc2goYWxlbWJpYyAqKSIsCiAgICAgICJCYXNoKHV2aWNvcm4gKikiLAogICAgICAiQmFzaChkb2NrZXIgY29tcG9zZSAqKSIsCiAgICAgICJCYXNoKGRvY2tlciBidWlsZCAqKSIsCiAgICAgICJCYXNoKGRvY2tlciBwcykiCiAgICBdLAogICAgImRlbnkiOiBbCiAgICAgICJSZWFkKC4vLmVudikiLAogICAgICAiUmVhZCguLy5lbnYubG9jYWwpIiwKICAgICAgIlJlYWQoLi8uZW52LmRldmVsb3BtZW50KSIsCiAgICAgICJSZWFkKC4vLmVudi5wcm9kdWN0aW9uKSIsCiAgICAgICJSZWFkKC4vLmVudi5zdGFnaW5nKSIKICAgIF0KICB9LAogICJob29rcyI6IHsKICAgICJOb3RpZmljYXRpb24iOiBbCiAgICAgIHsKICAgICAgICAibWF0Y2hlciI6ICIiLAogICAgICAgICJob29rcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgInR5cGUiOiAiY29tbWFuZCIsCiAgICAgICAgICAgICJjb21tYW5kIjogInBvd2Vyc2hlbGwgLWMgXCJbU3lzdGVtLk1lZGlhLlN5c3RlbVNvdW5kc106OkV4Y2xhbWF0aW9uLlBsYXkoKVwiIgogICAgICAgICAgfQogICAgICAgIF0KICAgICAgfQogICAgXSwKICAgICJTdG9wIjogWwogICAgICB7CiAgICAgICAgIm1hdGNoZXIiOiAiIiwKICAgICAgICAiaG9va3MiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJ0eXBlIjogImNvbW1hbmQiLAogICAgICAgICAgICAiY29tbWFuZCI6ICJwb3dlcnNoZWxsIC1jIFwiW1N5c3RlbS5NZWRpYS5TeXN0ZW1Tb3VuZHNdOjpBc3Rlcmlzay5QbGF5KClcIiIKICAgICAgICAgIH0KICAgICAgICBdCiAgICAgIH0KICAgIF0KICB9Cn0K";
 
+const HTACCESS_NORMAL_B64 = "IyDilIDilIAgUGFzc3dvcmQgcHJvdGVjdGlvbiBmb3IgeW91ciBzdGF0aWMgc2l0ZSAoQXBhY2hlIC8gUEhQIGhvc3RpbmcpIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgAojIEhUVFAgQmFzaWMgQXV0aDogdmlzaXRvcnMgbXVzdCBlbnRlciBhIHVzZXJuYW1lICsgcGFzc3dvcmQgdG8gc2VlIHRoZSBzaXRlLgojIFVwbG9hZCB0aGlzIGZpbGUgQU5EIC5odHBhc3N3ZCBpbnRvIHRoZSBzYW1lIGZvbGRlciBhcyB5b3VyIGJ1aWx0IHNpdGUKIyAodGhlIGZvbGRlciB5b3UgcHV0IG9uIHRoZSBzZXJ2ZXIg4oCUIG5leHQgdG8gaW5kZXguaHRtbCkuCiMKIyBPTkUgdGhpbmcgdG8gc2V0OiBBdXRoVXNlckZpbGUgbXVzdCBiZSB0aGUgQUJTT0xVVEUgcGF0aCB0byAuaHRwYXNzd2Qgb24gdGhlCiMgc2VydmVyLCBlLmcuIC9ob21lLzx5b3VyLXVzZXJuYW1lPi9wdWJsaWNfaHRtbC88eW91ci1mb2xkZXI+Ly5odHBhc3N3ZAojIFNlZSBQQVNTV09SRC1QUk9URUNUSU9OLm1kIOKAlCBvciBqdXN0IGFzayBDbGF1ZGUgQ29kZSB0byBzZXQgaXQgdXAgZm9yIHlvdS4KCkRpcmVjdG9yeUluZGV4IGluZGV4Lmh0bWwKCiMgSWYgdGhpcyBzdGF0aWMgc2l0ZSBzaXRzIGluIGEgc3ViZm9sZGVyIG9mIGFub3RoZXIgYXBwIChlLmcuIFdvcmRQcmVzcyksCiMgc3RvcCB0aGF0IGFwcCdzIHJld3JpdGUgcnVsZXMgZnJvbSBoaWphY2tpbmcgdGhpcyBmb2xkZXIg4oCUIHNlcnZlIHJlYWwgZmlsZXMKIyBoZXJlIGFzLWlzLiAoSGFybWxlc3MgaWYgdGhlcmUncyBubyBzdWNoIGFwcC4pCjxJZk1vZHVsZSBtb2RfcmV3cml0ZS5jPgogIFJld3JpdGVFbmdpbmUgT24KICBSZXdyaXRlQ29uZCAle1JFUVVFU1RfRklMRU5BTUV9IC1mIFtPUl0KICBSZXdyaXRlQ29uZCAle1JFUVVFU1RfRklMRU5BTUV9IC1kCiAgUmV3cml0ZVJ1bGUgXiAtIFtMXQo8L0lmTW9kdWxlPgoKQXV0aFR5cGUgQmFzaWMKQXV0aE5hbWUgIlJlc3RyaWN0ZWQiCkF1dGhVc2VyRmlsZSAiL2Fic29sdXRlL3BhdGgvdG8veW91ci9zaXRlLy5odHBhc3N3ZCIKUmVxdWlyZSB2YWxpZC11c2VyCgojIFNvbWUgaG9zdHMgKGUuZy4gd2hlbiBhIENNUyBydW5zIGF0IHRoZSBkb21haW4gcm9vdCkgcmVyb3V0ZSBhIDQwMSB0aHJvdWdoIHRoZQojIGFwcCBhbmQgdHVybiBpdCBpbnRvIGEgNDA0LCBzbyB0aGUgYnJvd3NlciBuZXZlciBzaG93cyB0aGUgbG9naW4gYm94LiBGb3JjZSBhCiMgcmVhbCwgcGxhaW4gNDAxIGZvciB0aGlzIGZvbGRlci4KRXJyb3JEb2N1bWVudCA0MDEgIkF1dGhlbnRpY2F0aW9uIHJlcXVpcmVkLiIKCjxGaWxlc01hdGNoICJeXC4oaHRhY2Nlc3N8aHRwYXNzd2QpJCI+CiAgUmVxdWlyZSBhbGwgZGVuaWVkCjwvRmlsZXNNYXRjaD4K";
+const HTPASSWD_NORMAL_B64 = "Y3JlYXRlOiRhcHIxJE0udFpFNUVNJFczTUd1MWtONnV0Z1RmazRWZThEdzEK";
+const PWPROT_NORMAL_B64 = "IyBQYXNzd29yZCBwcm90ZWN0aW9uIChQcml2YXRlIG1vZGUpCgpUaGlzIGtpdCBpbmNsdWRlcyB0d28gc21hbGwgZmlsZXMgdGhhdCBsb2NrIHlvdXIgc2l0ZSBiZWhpbmQgYSB1c2VybmFtZSBhbmQgcGFzc3dvcmQgdXNpbmcKQXBhY2hlJ3MgYnVpbHQtaW4gSFRUUCBCYXNpYyBBdXRoIOKAlCBubyBjb2RlLCBubyBkYXRhYmFzZS4gSXQncyB0aGUgc2ltcGxlc3Qgd2F5IHRvIGtlZXAgYSBzdGF0aWMKc2l0ZSBwcml2YXRlLgoKLSBgLmh0YWNjZXNzYCDigJQgdHVybnMgcHJvdGVjdGlvbiBvbiBmb3IgdGhlIGZvbGRlciBpdCBzaXRzIGluLgotIGAuaHRwYXNzd2RgIOKAlCBob2xkcyB0aGUgdXNlcm5hbWUgYW5kIGFuIGVuY3J5cHRlZCBwYXNzd29yZC4KCiMjIFdoYXQgdG8gZG8gKG9yIGp1c3QgYXNrIENsYXVkZSBDb2RlIHRvIGRvIGl0IGZvciB5b3UpCgoqKlRoZSBmYXN0ZXN0IHBhdGg6Kiogb3BlbiB5b3VyIHByb2plY3QgaW4gQ2xhdWRlIENvZGUgYW5kIHNheToKCj4gIlNldCB1cCB0aGUgcGFzc3dvcmQgcHJvdGVjdGlvbiBmb3IgbXkgc2l0ZS4gVXNlIHRoZSB1c2VybmFtZSBhbmQgcGFzc3dvcmQgSSBnaXZlIHlvdSwgYW5kIHRlbGwKPiBtZSBleGFjdGx5IHdoaWNoIGZvbGRlciBwYXRoIHRvIHB1dCBpbiB0aGUgYC5odGFjY2Vzc2AgZmlsZS4iCgpJZiB5b3UnZCByYXRoZXIgZG8gaXQgYnkgaGFuZDoKCjEuICoqU2V0IHlvdXIgdXNlcm5hbWUgYW5kIHBhc3N3b3JkLioqIFRoZSBzdGFydGVyIGxvZ2luIGlzIGBjcmVhdGVgIC8gYGNoYW5nZW1lYCDigJQgY2hhbmdlIGl0LgogICBBc2sgQ2xhdWRlIENvZGUsIG9yIHVzZSBhbnkgb25saW5lICJodHBhc3N3ZCBnZW5lcmF0b3IiIGFuZCBwYXN0ZSB0aGUgcmVzdWx0IGludG8gYC5odHBhc3N3ZGAKICAgKHRoZSBmb3JtYXQgaXMgYHVzZXJuYW1lOmVuY3J5cHRlZC1wYXNzd29yZGApLgoyLiAqKlNldCB0aGUgZmlsZSBwYXRoLioqIE9wZW4gYC5odGFjY2Vzc2AgYW5kIGNoYW5nZSBgQXV0aFVzZXJGaWxlYCB0byB0aGUgKiphYnNvbHV0ZSBwYXRoKiogb2YKICAgYC5odHBhc3N3ZGAgb24geW91ciBzZXJ2ZXIuIFlvdXIgaG9zdCdzIGZpbGUgbWFuYWdlciBzaG93cyB0aGlzIHBhdGg7IG9uIGNQYW5lbCBpdCB1c3VhbGx5CiAgIGxvb2tzIGxpa2UgYC9ob21lL3lvdXItdXNlcm5hbWUvcHVibGljX2h0bWwveW91ci1mb2xkZXIvLmh0cGFzc3dkYC4KMy4gKipVcGxvYWQgYm90aCBmaWxlcyoqIGludG8gdGhlIHNhbWUgZm9sZGVyIGFzIHlvdXIgYnVpbHQgc2l0ZSAobmV4dCB0byBgaW5kZXguaHRtbGApLgo0LiAqKlRlc3Q6Kiogb3BlbiB0aGUgc2l0ZSBpbiBhIHByaXZhdGUgYnJvd3NlciB3aW5kb3cg4oCUIGl0IHNob3VsZCBhc2sgZm9yIHRoZSB1c2VybmFtZSBhbmQKICAgcGFzc3dvcmQuCgojIyBOb3RlcwoKLSBUaGUgc3RhcnRlciBsb2dpbiBpcyBgY3JlYXRlYCAvIGBjaGFuZ2VtZWAuICoqQ2hhbmdlIGl0IGJlZm9yZSB5b3UgZ28gbGl2ZS4qKgotIFRoZXNlIGZpbGVzIHByb3RlY3QgdGhlIHdob2xlIGZvbGRlciB0aGV5J3JlIGluLCBpbmNsdWRpbmcgZXZlcnl0aGluZyBiZWxvdyBpdC4KLSBgLmh0YWNjZXNzYCBhbHJlYWR5IGJsb2NrcyBhbnlvbmUgZnJvbSBkb3dubG9hZGluZyB0aGUgcGFzc3dvcmQgZmlsZXMgdGhlbXNlbHZlcy4KLSBUaGlzIGlzIGZvciB0aGUgKipOb3JtYWwqKiAoc3RhdGljIHNpdGUpIGtpdC4gVGhlIEFkdmFuY2VkIChiYWNrZW5kKSBraXQgc2V0cyB1cCBwcm90ZWN0aW9uIGEKICBkaWZmZXJlbnQgd2F5IOKAlCB0aHJvdWdoIHRoZSBzZXR1cCBwcm9tcHQgaW4gaXRzIGBSRUFETUUubWRgLgo=";
+const README_ADVANCED_B64 = "IyBTdGFydCBoZXJlIOKAlCBydW4gdGhpcyBmaXJzdAoKWW91IGRvbid0IG5lZWQgdG8gYmUgYSBkZXZlbG9wZXIuIEJlZm9yZSBhbnl0aGluZyBlbHNlLCBvcGVuIHRoaXMgcHJvamVjdCBmb2xkZXIgaW4gKipDbGF1ZGUKQ29kZSoqIGFuZCBwYXN0ZSB0aGUgcHJvbXB0IGJlbG93LiBJdCByZXZpZXdzIHlvdXIgcHJvamVjdCwgc2V0cyBpdCB1cCB0aGUgaG91c2Ugd2F5LCBkZWNpZGVzIGhvdwpwYXNzd29yZCBwcm90ZWN0aW9uIHNob3VsZCB3b3JrLCBhbmQgZ2V0cyBpdCBvbnRvIHRoZSBjb21wYW55IEdpdEh1Yi4KCj4gKipBY2Nlc3MgbW9kZSBmb3IgdGhpcyBwcm9qZWN0OiB7e01PREV9fSoqCgojIyBUaGUgc2V0dXAgcHJvbXB0CgpDb3B5IGV2ZXJ5dGhpbmcgYmV0d2VlbiB0aGUgbGluZXMgYW5kIHBhc3RlIGl0IGludG8gQ2xhdWRlIENvZGU6CgotLS0KClNldCB1cCB0aGlzIHByb2plY3QgZm9yIG1lLiBJJ20gbm90IGEgZGV2ZWxvcGVyIOKAlCBleHBsYWluIGVhY2ggc3RlcCBpbiBwbGFpbiBsYW5ndWFnZSBiZWZvcmUgeW91CmRvIGl0LCBhbmQgbWFrZSB0aGUgdGVjaG5pY2FsIGRlY2lzaW9ucyB5b3Vyc2VsZi4KCjEuICoqUmV2aWV3IHRoZSBmb2xkZXIgZmlyc3QuKiogRmxhZyBhbnl0aGluZyB0aGF0IHNob3VsZCBuZXZlciBiZSB1cGxvYWRlZCDigJQgcGFzc3dvcmRzLCBBUEkga2V5cywKICAgYC5lbnZgIGZpbGVzLCBwcml2YXRlIGNsaWVudCBmaWxlcywgdGVtcG9yYXJ5IG9yIHBlcnNvbmFsIGZpbGVzLgoKMi4gKipCdWlsZCB0aGUgYmFja2VuZCB0aGUgaG91c2Ugd2F5KiogKGZvbGxvdyBgQ0xBVURFLm1kYCBhbmQgcnVuIHRoZSBgYmFja2VuZC1zY2FmZm9sZGAgc2tpbGwpOgogICBQeXRob24gKyBGYXN0QVBJICsgU1FMQWxjaGVteSwgU1FMaXRlIGZvciBsaWdodHdlaWdodCBkYXRhIG9yIGNsb3VkIE15U1FMIGZvciBwcm9kdWN0aW9uLAogICBEb2NrZXIgQ29tcG9zZSBmb3IgdGhlIGJhY2tlbmQgb25seSwgUnVmZiwgUHl0ZXN0LiBLZWVwIGl0IHNpbXBsZSDigJQgbm8gQ2VsZXJ5LCBSZWRpcywgS2Fma2EsCiAgIEt1YmVybmV0ZXMsIG9yIGEgbG9jYWwgTXlTUUwgY29udGFpbmVyIHVubGVzcyBhIHJlcXVpcmVtZW50IGNsZWFybHkgbmVlZHMgaXQuIEZvciBjbG91ZCBNeVNRTAogICBjcmVkZW50aWFscywgdGVsbCBtZSB0byBhc2sgRFgg4oCUIG5ldmVyIGludmVudCB0aGVtLgoKMy4gKipBY2Nlc3MgcHJvdGVjdGlvbjogdGhpcyBwcm9qZWN0IGlzIHt7TU9ERX19LioqCiAgIC0gSWYgUFJJVkFURTogYWRkIGF1dGhlbnRpY2F0aW9uIHNvIG9ubHkgbG9nZ2VkLWluIHVzZXJzIGNhbiByZWFjaCBwcm90ZWN0ZWQgZGF0YS4gVXNlIGEKICAgICBwcm92ZW4gbGlicmFyeSBhbmQgbW9kZXJuIHBhc3N3b3JkIGhhc2hpbmcgKG5ldmVyIGN1c3RvbSBjcnlwdG8pLCBrZWVwIHNlY3JldHMgaW4gYC5lbnZgCiAgICAgb25seSwgYW5kIGVuZm9yY2UgYWNjZXNzIG9uIHRoZSBBUEkg4oCUIG5vdCBpbiB0aGUgYnJvd3Nlci4gVGVsbCBtZSBleGFjdGx5IHdoYXQgY3JlZGVudGlhbHMKICAgICBvciBpbmZyYXN0cnVjdHVyZSB5b3UgbmVlZCBmcm9tIERYLgogICAtIElmIFBVQkxJQzogbm8gbG9naW4gaXMgcmVxdWlyZWQsIGJ1dCBzdGlsbCBuZXZlciBleHBvc2Ugc2VjcmV0cyBhbmQgdmFsaWRhdGUgZXZlcnkgaW5wdXQuCgo0LiAqKlByZXBhcmUgYSBjbGVhciBgUkVBRE1FLm1kYCBhbmQgYSBgLmdpdGlnbm9yZWAuKiogTmV2ZXIgY29tbWl0IHJlYWwgc2VjcmV0cyDigJQgY29tbWl0IG9ubHkKICAgYC5lbnYuZXhhbXBsZWAgd2l0aCBzYWZlIHBsYWNlaG9sZGVyIHZhbHVlcy4KCjUuICoqUHV0IGl0IG9uIHRoZSBjb21wYW55IEdpdEh1YjoqKiBpbml0aWFsaXplIEdpdCwgbWFrZSB0aGUgZmlyc3QgY29tbWl0LCBjb25uZWN0IGl0IHRvIHRoZQogICBjb3JyZWN0IGNvbXBhbnkgcmVwb3NpdG9yeSwgYW5kIHB1c2ggdG8gdGhlIGBtYWluYCBicmFuY2guIEFzayBtZSBmb3IgdGhlIHJlcG9zaXRvcnkgbGluayB3aGVuCiAgIHlvdSBuZWVkIGl0LgoKR28gc3RlcCBieSBzdGVwLCBhbmQgcGF1c2UgZm9yIG15IGNvbmZpcm1hdGlvbiBiZWZvcmUgYW55dGhpbmcgdGhhdCBjaGFuZ2VzIGZpbGVzIG9yIHVwbG9hZHMuCgotLS0KCiMjIEJlZm9yZSB5b3UgcnVuIGl0IOKAlCB0aGUgR2l0SHViIGNoZWNrbGlzdAoKWW91IG5lZWQgYW4gZW1wdHkgY29tcGFueSBHaXRIdWIgcmVwb3NpdG9yeSByZWFkeS4gSWYgeW91IGRvbid0IGhhdmUgb25lIHlldDoKCjEuIFJlZ2lzdGVyIG9uIEdpdEh1YiB3aXRoIHlvdXIgKipjb21wYW55IGVtYWlsKiosIHRoZW4gYXNrIEltcmFuIG9yIE9rc2FuYSB0byBhZGQgeW91IHRvIHRoZQogICBjb21wYW55IG9yZ2FuaXphdGlvbi4KMi4gU2lnbiBpbiB3aXRoIHRoYXQgY29tcGFueSBlbWFpbC4KMy4gQ3JlYXRlIGEgKipjb21wbGV0ZWx5IGVtcHR5KiogcmVwb3NpdG9yeSBpbiB0aGUgb3JnYW5pemF0aW9uIOKAlCBubyBSRUFETUUsIGAuZ2l0aWdub3JlYCwKICAgbGljZW5zZSwgb3Igc3RhcnRlciBmaWxlcy4KNC4gQ29weSBpdHMgbGluayAoZS5nLiBgaHR0cHM6Ly9naXRodWIuY29tL2NvbXBhbnktbmFtZS9wcm9qZWN0LW5hbWUuZ2l0YCkg4oCUIHlvdSdsbCBwYXN0ZSBpdCB3aGVuCiAgIENsYXVkZSBhc2tzIGluIHN0ZXAgNS4KCiMjIE5ldmVyIHVwbG9hZAoKUGFzc3dvcmRzIMK3IEFQSSBrZXlzIMK3IGAuZW52YCBmaWxlcyDCtyBwcml2YXRlIGNsaWVudCBmaWxlcyDCtyB0ZW1wb3Jhcnkgb3IgcGVyc29uYWwgZmlsZXMgwrcgYW55CmNvbmZpZGVudGlhbCBjb21wYW55IGZpbGVzIHRoYXQgYXJlbid0IHBhcnQgb2YgdGhlIHByb2plY3QuCgojIyBXaGF0J3MgaW4gdGhpcyBraXQKCi0gYENMQVVERS5tZGAg4oCUIHRoZSBhbHdheXMtb24gYnJpZWYgdGhlIGFnZW50IGZvbGxvd3MgKGRlZmF1bHQgc3RhY2ssIGJvdW5kYXJpZXMsIGFzay1EWCBydWxlKS4KLSBgLmNsYXVkZS9za2lsbHMvYmFja2VuZC1zY2FmZm9sZGAg4oCUIHN0YW5kcyB1cCB0aGUgRmFzdEFQSSBiYWNrZW5kIHN0cnVjdHVyZS4KLSBgLmNsYXVkZS9za2lsbHMvYmFja2VuZC1xdWFsaXR5LWNoZWNrcG9pbnRgIOKAlCB0aGUgbWlsZXN0b25lICYgcHJlLWRlcGxveSBhdWRpdC4KLSBgLmNsYXVkZS9zZXR0aW5ncy5sb2NhbC5qc29uYCDigJQgY29tbWFuZCBwZXJtaXNzaW9ucywgZGVza3RvcCBub3RpZmljYXRpb25zLCBgLmVudmAgcmVhZC1ibG9jay4K";
+
 const KIT = {
   normal: {
     zipName: "normal-boilerplate",
@@ -482,26 +509,79 @@ function toast(msg){
   setTimeout(() => t.classList.remove('show'), 1600);
 }
 
+let ACCESS = "private";
+const textBytes = t => new TextEncoder().encode(t);
+const b64Text = b64 => new TextDecoder().decode(b64ToBytes(b64));
+
 function downloadBoilerplate(tier, os){
   const kit = KIT[tier];
+  const zn = kit.zipName;
   const files = kit.files(os).map(f => ({ name: f.name, data: b64ToBytes(f.b64) }));
+  const priv = ACCESS === "private";
+
+  if (tier === "normal" && priv){
+    // A password-protected site can't be crawled — drop the SEO/GEO section from the skill.
+    const skillName = `${zn}/.claude/skills/quality-checkpoint/SKILL.md`;
+    const sf = files.find(f => f.name === skillName);
+    if (sf){
+      const t = b64Text(SKILL_NORMAL_B64)
+        .replace(/\*\*SEO & GEO\*\*[\s\S]*?\n\n(?=\*\*Security\*\*)/, "")
+        .replace("accessibility/SEO/GEO", "accessibility");
+      sf.data = textBytes(t);
+    }
+    // Ship the Apache Basic-Auth files.
+    files.push({ name: `${zn}/.htaccess`, data: b64ToBytes(HTACCESS_NORMAL_B64) });
+    files.push({ name: `${zn}/.htpasswd`, data: b64ToBytes(HTPASSWD_NORMAL_B64) });
+    files.push({ name: `${zn}/PASSWORD-PROTECTION.md`, data: b64ToBytes(PWPROT_NORMAL_B64) });
+  }
+  if (tier === "advanced"){
+    // Always ship the run-first README; inject the chosen access mode.
+    const readme = b64Text(README_ADVANCED_B64).split("{{MODE}}").join(ACCESS);
+    files.push({ name: `${zn}/README.md`, data: textBytes(readme) });
+  }
+
   const zip = buildZip(files);
   const blob = new Blob([zip], { type: "application/zip" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${kit.zipName}-${os === "mac" ? "macos" : "windows"}.zip`;
+  a.download = `${zn}-${ACCESS}-${os === "mac" ? "macos" : "windows"}.zip`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  toast(os === "mac" ? "Downloading for macOS…" : "Downloading for Windows…");
+  toast(`Downloading ${ACCESS} · ${os === "mac" ? "macOS" : "Windows"}…`);
 }
 
 // Wire up downloads
 document.querySelectorAll('.dl-btn').forEach(btn =>
   btn.addEventListener('click', () => downloadBoilerplate(btn.dataset.tier, btn.dataset.os))
 );
+
+// Public / Private access toggle
+function updateModeNotes(){
+  const priv = ACCESS === "private";
+  const n = document.querySelector('.mode-note[data-note="normal"]');
+  const a = document.querySelector('.mode-note[data-note="advanced"]');
+  if (n) n.textContent = priv
+    ? "Private: ships .htaccess + .htpasswd password protection and PASSWORD-PROTECTION.md — and drops SEO/GEO from the checklist (a locked site isn't crawled)."
+    : "Public: no password protection. Switch to Private (top) to lock the site behind a login.";
+  if (a) a.textContent = priv
+    ? "Private: the run-first prompt in README.md will set up login / authentication for the backend."
+    : "Public: no login required. README.md still holds the run-first setup prompt.";
+}
+document.querySelectorAll('.seg-btn').forEach(btn =>
+  btn.addEventListener('click', () => {
+    ACCESS = btn.dataset.access;
+    document.querySelectorAll('.seg-btn').forEach(b => {
+      const on = b === btn;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    updateModeNotes();
+  })
+);
+updateModeNotes();
 
 // Tab switching
 document.querySelectorAll('.tab').forEach(tab =>
