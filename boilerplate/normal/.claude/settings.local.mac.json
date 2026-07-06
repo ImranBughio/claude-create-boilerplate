@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm i *)",
+      "Bash(npm ls *)",
+      "Bash(npm outdated)",
+      "Bash(npm audit)",
+      "Bash(npx next *)",
+      "Bash(npx serve out)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude needs your input\" with title \"Claude Code\" sound name \"Glass\"'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Task finished\" with title \"Claude Code\" sound name \"Ping\"'"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,13 +1,25 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)",
-      "Bash(npm i *)",
-      "Bash(npm ls *)",
-      "Bash(npm outdated)",
-      "Bash(npm audit)",
-      "Bash(npx next *)",
-      "Bash(npx serve out)"
+      "Bash(uv *)",
+      "Bash(python -m *)",
+      "Bash(python3 -m *)",
+      "Bash(pip install *)",
+      "Bash(pip list)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(alembic *)",
+      "Bash(uvicorn *)",
+      "Bash(docker compose *)",
+      "Bash(docker build *)",
+      "Bash(docker ps)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.development)",
+      "Read(./.env.production)",
+      "Read(./.env.staging)"
     ]
   },
   "hooks": {
