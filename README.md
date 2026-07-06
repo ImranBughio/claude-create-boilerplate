@@ -46,7 +46,7 @@ It changes what each kit ships:
 - **Advanced** → always ships `README.md`; Private mode injects an instruction for the setup
   prompt to add app-level authentication. Public mode leaves the same run-first prompt without it.
 
-The starter Normal login is `create` / `changeme` — **change it before going live** (see the
+The starter Normal login is `create` / `JLXv2b0OiDE6` — **change it before going live** (see the
 kit's `PASSWORD-PROTECTION.md`).
 
 Each `CLAUDE.md` stays deliberately short — the detailed guidance lives in the skills, and the
